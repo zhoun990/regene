@@ -22,10 +22,10 @@ import {
 	AdMobRewarded,
 	setTestDeviceIDAsync,
 } from "expo-ads-admob";
-export const resetPanelAds = () => {
+export const resetPanelAds = (text) => {
 	let promise = new Promise(async (resolve, reject) => {
 		Alert.alert(
-			`広告を視聴してパネルをリセットしますか？`,
+			text,
 			``,
 			[
 				{
@@ -42,8 +42,12 @@ export const resetPanelAds = () => {
 							resolve(false);
 							AdMobRewarded.removeAllListeners();
 						});
-						await AdMobRewarded.requestAdAsync();
-						await AdMobRewarded.showAdAsync();
+						await AdMobRewarded.showAdAsync().catch(() => {
+							Alert.alert(
+								"エラーが発生しました。",
+								"通信環境を確認して再度お試しください。"
+							);
+						});
 					},
 				},
 				{

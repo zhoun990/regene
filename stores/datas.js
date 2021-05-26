@@ -4,6 +4,7 @@ import { RandomNumber } from "../api/RandomNumber";
 
 // Stateの初期状態
 const initialState = {
+	screen: "A",
 	panel: [
 		{ isDead: false, restTurn: 5, defaultTurn: 5 },
 		{ isDead: false, restTurn: 5, defaultTurn: 5 },
@@ -131,6 +132,9 @@ const slice = createSlice({
 					state.panel[i].defaultTurn = random;
 				}
 			}
+		},
+		navigate: (state, action) => {
+			state.screen = action.payload;
 		},
 	},
 });

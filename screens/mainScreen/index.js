@@ -1,8 +1,8 @@
 import React, { useEffect, usepanel, createRef, useRef } from "react";
 import { SafeAreaView, TouchableOpacity, View, Alert } from "react-native";
-import { Button } from "react-native-elements";
+// import { Button } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
-import { Text } from "../../custom/CustomComponents";
+import { Text, Button } from "../../custom/CustomComponents";
 import { actions } from "../../stores/datas";
 import {
 	AdMobBanner,
@@ -11,6 +11,7 @@ import {
 	AdMobRewarded,
 	setTestDeviceIDAsync,
 } from "expo-ads-admob";
+import { resetPanelAds } from "../../components/resetPanelAds";
 export const Main = () => {
 	const dispatch = useDispatch();
 	const state = useSelector((panel) => panel.datas);
@@ -23,9 +24,11 @@ export const Main = () => {
 		if (!state.isInited) {
 			dispatch(actions.initPanels());
 		}
-		// (async () => {
-		// 	await setTestDeviceIDAsync("EMULATOR");
-		// })();
+		(async () => {
+			await setTestDeviceIDAsync("EMULATOR");
+			await AdMobRewarded.setAdUnitID("ca-app-pub-3940256099942544/5224354917");
+			adRequest();
+		})();
 	}, []);
 	useEffect(() => {
 		const deadPanelCount = panel.filter((item) => item.isDead == true).length;
@@ -33,11 +36,13 @@ export const Main = () => {
 			// dispatch(actions.initPanels());
 			Alert.alert(
 				"おめでとう！",
-				`Level${state.level}をクリアしました。Reloadをタップしてもう一度プレイするか、Lv.ボタンをタップして次に進みましょう`
+				`Level${state.level}をクリアしました。Reloadをタップしてもう一度プレイするか、Lv.ボタンをタップして次のレベルに進みましょう`
 			);
 		}
 	}, [panel]);
-
+	const adRequest = async () => {
+		await AdMobRewarded.requestAdAsync();
+	};
 	const colorMaker = (n) => {
 		if (!panel[n].isDead) {
 			return "black";
@@ -60,10 +65,22 @@ export const Main = () => {
 					}}
 				>
 					<Button
+						title="戻る"
+						onPress={async () => {
+							dispatch(actions.navigate("A"));
+						}}
+					/>
+					<Button
 						title="リセット"
 						onPress={async () => {
-							resetPanelAds;
-							dispatch(actions.initPanels());
+							resetPanelAds("広告を視聴してパネルをリセットしますか？").then(
+								(bool) => {
+									if (bool) {
+										dispatch(actions.initPanels());
+										adRequest();
+									}
+								}
+							);
 						}}
 					/>
 					<View
@@ -81,7 +98,23 @@ export const Main = () => {
 								width: 100,
 							}}
 							onPress={() => {
-								dispatch(actions.levelHandler(false));
+								Alert.alert(
+									"レベルを下げてよろしいですか？",
+									``,
+									[
+										{
+											text: `レベルを下げる`,
+											onPress: () => {
+												dispatch(actions.levelHandler(false));
+											},
+										},
+										{
+											text: "キャンセル",
+											onPress: () => {},
+										},
+									],
+									{ cancelable: true }
+								);
 							}}
 							disabled={state.level == 1}
 						/>
@@ -93,7 +126,7 @@ export const Main = () => {
 								alignItems: "center",
 							}}
 						>
-							<Text>{state.level}</Text>
+							<Text>Lv.{state.level}</Text>
 						</View>
 						<Button
 							title="Lv. up"
@@ -101,8 +134,15 @@ export const Main = () => {
 							style={{
 								width: 100,
 							}}
-							onPress={() => {
-								dispatch(actions.levelHandler(true));
+							onPress={async () => {
+								resetPanelAds("広告を視聴して次のレベルに進みますか？").then(
+									(bool) => {
+										if (bool) {
+											dispatch(actions.levelHandler(true));
+											adRequest();
+										}
+									}
+								);
 							}}
 							disabled={state.level == 5}
 						/>
@@ -134,12 +174,12 @@ export const Main = () => {
 					</View>
 				))}
 			</View>
-			{/* <AdMobBanner
+			<AdMobBanner
 				bannerSize="fullBanner"
 				adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
 				servePersonalizedAds // true or false
 				// onDidFailToReceiveAdWithError={this.bannerError}
-			/> */}
+			/>
 		</SafeAreaView>
 	);
 };
