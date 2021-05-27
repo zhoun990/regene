@@ -26,7 +26,7 @@ export const translations = {
 		doAgree: "Do you agree with the Terms of Service and Privacy Policy?",
 		agree: "I agree",
 		tos: "Terms of Service and Privacy Policy",
-		tosURL: "https://www.ngm-deeper.com/en/regene/tos",
+		tosURL: "https://regenerate-eight.vercel.app/en/tos",
 	},
 	ja: {
 		back: "戻る",
@@ -53,6 +53,6 @@ export const translations = {
 		doAgree: "利用規約とプライバシーポリシーに同意しますか？",
 		agree: "同意する",
 		tos: "利用規約とプライバシーポリシー",
-		tosURL: "https://www.ngm-deeper.com/regene/tos",
+		tosURL: "https://regenerate-eight.vercel.app/ja/tos",
 	},
 };
