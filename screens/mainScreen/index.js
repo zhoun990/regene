@@ -44,7 +44,7 @@ export const Main = () => {
 			if (Platform.OS !== "web") {
 				// await setTestDeviceIDAsync("EMULATOR");
 				await AdMobRewarded.setAdUnitID(
-					__DEV__ || Constants.isDevice
+					__DEV__ || !Constants.isDevice
 						? "ca-app-pub-3940256099942544/5224354917"
 						: "ca-app-pub-4125138884903603/4614205616"
 				);
@@ -249,7 +249,7 @@ export const Main = () => {
 			<AdMobBanner
 				// bannerSize="fullBanner"
 				adUnitID={
-					__DEV__ || Constants.isDevice
+					__DEV__ || !Constants.isDevice
 						? "ca-app-pub-3940256099942544/6300978111"
 						: "ca-app-pub-4125138884903603/8811297461"
 				} // Test ID, Replace with your-admob-unit-id

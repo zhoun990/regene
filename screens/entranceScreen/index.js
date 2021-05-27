@@ -18,7 +18,7 @@ export const Entrance = () => {
 	const dispatch = useDispatch();
 	const state = useSelector((state) => state.datas);
 	const onPress = () => {
-		if (!state.isInited) {
+		if (state.isInited) {
 			dispatch(actions.navigate("B"));
 		} else {
 			Alert.alert(
