@@ -22,6 +22,8 @@ import {
 	AdMobRewarded,
 	setTestDeviceIDAsync,
 } from "expo-ads-admob";
+import i18n from "i18n-js";
+
 export const resetPanelAds = (text) => {
 	let promise = new Promise(async (resolve, reject) => {
 		Alert.alert(
@@ -29,7 +31,7 @@ export const resetPanelAds = (text) => {
 			``,
 			[
 				{
-					text: `広告を視聴する`,
+					text: i18n.t("wacthAds"),
 					onPress: async () => {
 						AdMobRewarded.addEventListener(
 							"rewardedVideoUserDidEarnReward",
@@ -43,15 +45,12 @@ export const resetPanelAds = (text) => {
 							AdMobRewarded.removeAllListeners();
 						});
 						await AdMobRewarded.showAdAsync().catch(() => {
-							Alert.alert(
-								"エラーが発生しました。",
-								"通信環境を確認して再度お試しください。"
-							);
+							Alert.alert(i18n.t("errorHappend"), i18n.t("errorRetry"));
 						});
 					},
 				},
 				{
-					text: "キャンセル",
+					text: i18n.t("cancel"),
 					onPress: () => {
 						resolve(false);
 					},

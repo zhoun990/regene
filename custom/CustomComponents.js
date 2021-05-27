@@ -24,16 +24,6 @@ export const Text = (props) => {
 	}
 };
 export const Button = (props) => {
-	const [isPressed, setIsPressed] = useState(false);
-	useEffect(() => {}, []);
-	const onPress = () => {
-		props.onPress();
-
-		if (props.onPressedTimeEnable) {
-			setIsPressed(true);
-			setTimeout(() => setIsPressed(false), 500);
-		}
-	};
 	{
 		if (props.type == "outline") {
 			return (
@@ -49,8 +39,6 @@ export const Button = (props) => {
 						{ color: Colors.primary, fontWeight: "500" },
 						props.titleStyle,
 					]}
-					onPress={onPress}
-					disabled={isPressed}
 				>
 					{props.children}
 				</NativeButton>
@@ -70,8 +58,6 @@ export const Button = (props) => {
 						{ color: Colors.primary, fontWeight: "500" },
 						props.titleStyle,
 					]}
-					onPress={onPress}
-					disabled={isPressed}
 				>
 					{props.children}
 				</NativeButton>
@@ -88,8 +74,6 @@ export const Button = (props) => {
 						props.buttonStyle,
 					]}
 					titleStyle={[{ fontWeight: "500" }, props.titleStyle]}
-					onPress={onPress}
-					disabled={isPressed}
 				>
 					{props.children}
 				</NativeButton>

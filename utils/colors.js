@@ -16,6 +16,7 @@ export const Colors = {
 	red: "#fc5c65",
 	frame: "#aaa",
 	cancel: "#ebebeb",
+	count: 18,
 };
 // export const darkColorcontroller = () => {
 // 	let scheme = useColorScheme();

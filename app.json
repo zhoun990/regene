@@ -2,13 +2,13 @@
   "expo": {
     "name": "Re:Generate",
     "slug": "regene",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#7d0b98"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -18,16 +18,19 @@
     ],
     "ios": {
       "bundleIdentifier": "com.ngm.regenerate",
-      "buildNumber": "0.2.0",
+      "buildNumber": "1.0.0",
       "supportsTablet": true,
       "userInterfaceStyle": "automatic",
       "config": {
-        "googleMobileAdsAppId": "ca-app-pub-3940256099942544~1458002511"
+        "googleMobileAdsAppId": "ca-app-pub-4125138884903603~3005556577"
+      },
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true
       }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon_adaptive.png",
         "backgroundColor": "#FFFFFF"
       }
     },

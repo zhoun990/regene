@@ -1,0 +1,58 @@
+import { Colors } from "./colors";
+
+export const translations = {
+	en: {
+		back: "Back",
+		reset: "Reset",
+		cancel: "Cancel",
+		turn: "",
+		count: "Turns",
+		adCount: "Remaining",
+		congratulations: "Congratulations!",
+		clearText:
+			" creared! Tap Reset Button to play again, or tap the Level Button to advance to the next level",
+		watchAdsText: "Would you like to watch an ad and reset the panel?",
+		levelDownAlert: "Are you sure you want to lower the level?",
+		levelDown: "Lower the level",
+		nextAds: "Would you like to watch an ad and take it to the next level?",
+		wacthAds: "Watch an ad",
+		errorHappend: "An error has occurred",
+		errorRetry: "Please check your network and try again.",
+		hint: "Tips!",
+		hintText: "First, try tapping from the smallest number.",
+		allStageClearText:
+			"Congratulations on clearing level 5 !!! Actually, I thought that it was impossible to clear level 5. If you share it on social media and I finds it, I may want to update this app that adds even higher difficulty!",
+		timeup: "Would you like to watch an ad and add more turns?",
+		doAgree: "Do you agree with the Terms of Service and Privacy Policy?",
+		agree: "I agree",
+		tos: "Terms of Service and Privacy Policy",
+		tosURL: "https://www.ngm-deeper.com/en/regene/tos",
+	},
+	ja: {
+		back: "戻る",
+		reset: "リセット",
+		cancel: "キャンセル",
+		turn: "ターン",
+		count: "経過ターン数",
+		adCount: "あと",
+		congratulations: "おめでとう！",
+		clearText:
+			"をクリアしました。Resetをタップしてもう一度プレイするか、Lv.ボタンをタップして次のレベルに進みましょう",
+		watchAdsText: "広告を視聴してパネルをリセットしますか？",
+		levelDownAlert: "レベルを下げてよろしいですか？",
+		levelDown: "レベルを下げる",
+		nextAds: "広告を視聴して次のレベルに進みますか？",
+		wacthAds: "広告を視聴する",
+		errorHappend: "エラーが発生しました。",
+		errorRetry: "通信環境を確認して再度お試しください。",
+		hint: "ヒント",
+		hintText: "まずは小さい数字から順にタップしてみよう！",
+		allStageClearText:
+			"レベル5のクリアおめでとうございます!!!実は開発者はレベル5のクリアは不可能だと思っていました。SNSでシェアすると、もし開発者がそれを見つけた場合、さらに上の難易度を追加するアップデートを行いたくなるかもしれませんよ!",
+		timeup: "広告を視聴して残りターン数を追加しますか？",
+		doAgree: "利用規約とプライバシーポリシーに同意しますか？",
+		agree: "同意する",
+		tos: "利用規約とプライバシーポリシー",
+		tosURL: "https://www.ngm-deeper.com/regene/tos",
+	},
+};

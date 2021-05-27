@@ -27,6 +27,7 @@ const initialState = {
 	min: 3,
 	level: 1,
 	isInited: false,
+	count: 0,
 };
 
 const slice = createSlice({
@@ -36,6 +37,8 @@ const slice = createSlice({
 		updateSinglePanel: (state, action) => {
 			if (state.panel[action.payload].isDead) {
 				return state;
+			} else {
+				state.count++;
 			}
 			state.panel[action.payload].isDead = true;
 			state.panel[action.payload].restTurn = RandomNumber(state.max, state.min);
@@ -48,6 +51,7 @@ const slice = createSlice({
 			}
 			for (let i = 0; i < state.panel.length; i++) {
 				const panel = state.panel[i];
+
 				if (!panel.isDead) {
 					if (panel.restTurn == 0) {
 						panel.restTurn = RandomNumber(state.max, state.min);
@@ -87,6 +91,8 @@ const slice = createSlice({
 		},
 		initPanels: (state, action) => {
 			state.isInited = true;
+			state.count = 0;
+
 			for (let i = 0; i < state.panel.length; i++) {
 				state.panel[i].isDead = false;
 				const random = RandomNumber(state.max, state.min);
@@ -96,9 +102,9 @@ const slice = createSlice({
 			}
 		},
 		levelHandler: (state, action) => {
+			state.count = 0;
 			if (action.payload && state.level < 5) {
 				state.max--;
-
 				state.level++;
 				if (state.level > 4) {
 					state.min = 1;

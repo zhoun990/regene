@@ -1,5 +1,11 @@
 import React, { useEffect, usepanel, createRef, useRef } from "react";
-import { SafeAreaView, TouchableOpacity, View, Alert } from "react-native";
+import {
+	SafeAreaView,
+	TouchableOpacity,
+	View,
+	Alert,
+	Platform,
+} from "react-native";
 // import { Button } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
 import { Text, Button } from "../../custom/CustomComponents";
@@ -12,32 +18,52 @@ import {
 	setTestDeviceIDAsync,
 } from "expo-ads-admob";
 import { resetPanelAds } from "../../components/resetPanelAds";
+import * as Localization from "expo-localization";
+import i18n from "i18n-js";
+import { translations } from "../../utils/tranclations";
+import { Colors } from "../../utils/colors";
+import Constants from "expo-constants";
+
 export const Main = () => {
 	const dispatch = useDispatch();
 	const state = useSelector((panel) => panel.datas);
 	const panel = useSelector((panel) => panel.datas.panel);
 	const mapItem = [0, 1, 2, 3];
+	const remaining = Colors.count + 4 * state.level;
+	const adTurn =
+		remaining * (Math.floor(state.count / remaining) + 1) - 1 - state.count;
 	if (!panel) {
 		return null;
 	}
 	useEffect(() => {
 		if (!state.isInited) {
+			Alert.alert(i18n.t("hint"), i18n.t("hintText"));
 			dispatch(actions.initPanels());
 		}
 		(async () => {
-			await setTestDeviceIDAsync("EMULATOR");
-			await AdMobRewarded.setAdUnitID("ca-app-pub-3940256099942544/5224354917");
-			adRequest();
+			if (Platform.OS !== "web") {
+				// await setTestDeviceIDAsync("EMULATOR");
+				await AdMobRewarded.setAdUnitID(
+					__DEV__ || Constants.isDevice
+						? "ca-app-pub-3940256099942544/5224354917"
+						: "ca-app-pub-4125138884903603/4614205616"
+				);
+				adRequest();
+			}
 		})();
 	}, []);
 	useEffect(() => {
 		const deadPanelCount = panel.filter((item) => item.isDead == true).length;
 		if (deadPanelCount == 16) {
 			// dispatch(actions.initPanels());
-			Alert.alert(
-				"おめでとう！",
-				`Level${state.level}をクリアしました。Reloadをタップしてもう一度プレイするか、Lv.ボタンをタップして次のレベルに進みましょう`
-			);
+			if (state.level !== 5) {
+				Alert.alert(
+					i18n.t("congratulations"),
+					`Level${state.level}${i18n.t("clearText")}`
+				);
+			} else {
+				Alert.alert(i18n.t("congratulations"), i18n.t("allStageClearText"));
+			}
 		}
 	}, [panel]);
 	const adRequest = async () => {
@@ -51,36 +77,44 @@ export const Main = () => {
 		}
 	};
 	const onPress = (n) => {
-		dispatch(actions.updateSinglePanel(n));
+		if (adTurn !== 0) {
+			dispatch(actions.updateSinglePanel(n));
+		} else {
+			resetPanelAds(i18n.t("timeup")).then((bool) => {
+				if (bool) {
+					dispatch(actions.updateSinglePanel(n));
+					adRequest();
+				}
+			});
+		}
 	};
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
 			<View style={{ flex: 1, marginBottom: 20 }}>
 				<View
 					style={{
-						height: 100,
+						height: 80,
 						flexDirection: "row",
 						justifyContent: "space-around",
 						alignItems: "center",
 					}}
 				>
 					<Button
-						title="戻る"
+						type="outline"
+						title={i18n.t("back")}
 						onPress={async () => {
 							dispatch(actions.navigate("A"));
 						}}
 					/>
 					<Button
-						title="リセット"
+						title={i18n.t("reset")}
 						onPress={async () => {
-							resetPanelAds("広告を視聴してパネルをリセットしますか？").then(
-								(bool) => {
-									if (bool) {
-										dispatch(actions.initPanels());
-										adRequest();
-									}
+							resetPanelAds(i18n.t("watchAdsText")).then((bool) => {
+								if (bool) {
+									dispatch(actions.initPanels());
+									adRequest();
 								}
-							);
+							});
 						}}
 					/>
 					<View
@@ -99,18 +133,17 @@ export const Main = () => {
 							}}
 							onPress={() => {
 								Alert.alert(
-									"レベルを下げてよろしいですか？",
+									i18n.t("levelDownAlert"),
 									``,
 									[
 										{
-											text: `レベルを下げる`,
+											text: i18n.t("levelDown"),
 											onPress: () => {
 												dispatch(actions.levelHandler(false));
 											},
 										},
 										{
-											text: "キャンセル",
-											onPress: () => {},
+											text: i18n.t("cancel"),
 										},
 									],
 									{ cancelable: true }
@@ -135,17 +168,56 @@ export const Main = () => {
 								width: 100,
 							}}
 							onPress={async () => {
-								resetPanelAds("広告を視聴して次のレベルに進みますか？").then(
-									(bool) => {
-										if (bool) {
-											dispatch(actions.levelHandler(true));
-											adRequest();
-										}
+								resetPanelAds(i18n.t("nextAds")).then((bool) => {
+									if (bool) {
+										dispatch(actions.levelHandler(true));
+										adRequest();
 									}
-								);
+								});
 							}}
 							disabled={state.level == 5}
 						/>
+					</View>
+				</View>
+				<View
+					style={{
+						height: 40,
+						marginBottom: 20,
+					}}
+				>
+					<View
+						style={{
+							flex: 1,
+							// height: 20,
+							flexDirection: "row",
+							justifyContent: "space-evenly",
+							alignItems: "center",
+							// borderWidth: 1,
+						}}
+					>
+						<View
+							style={{
+								alignItems: "center",
+							}}
+						>
+							<Text style={{ color: Colors.secondary }}>{i18n.t("count")}</Text>
+							<Text>
+								{state.count} {i18n.t("turn")}
+							</Text>
+						</View>
+						<View
+							style={{
+								alignItems: "center",
+							}}
+						>
+							<Text style={{ color: Colors.secondary }}>
+								{i18n.t("adCount")}
+							</Text>
+							<Text>
+								{adTurn}
+								{i18n.t("turn")}
+							</Text>
+						</View>
 					</View>
 				</View>
 				{mapItem.map((column, i) => (
@@ -175,8 +247,12 @@ export const Main = () => {
 				))}
 			</View>
 			<AdMobBanner
-				bannerSize="fullBanner"
-				adUnitID="ca-app-pub-3940256099942544/6300978111" // Test ID, Replace with your-admob-unit-id
+				// bannerSize="fullBanner"
+				adUnitID={
+					__DEV__ || Constants.isDevice
+						? "ca-app-pub-3940256099942544/6300978111"
+						: "ca-app-pub-4125138884903603/8811297461"
+				} // Test ID, Replace with your-admob-unit-id
 				servePersonalizedAds // true or false
 				// onDidFailToReceiveAdWithError={this.bannerError}
 			/>
