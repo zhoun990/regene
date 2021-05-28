@@ -2,21 +2,21 @@
 // import { useColorScheme } from "react-native-appearance";
 
 export const Colors = {
-	primary: "#a965e0",
-	background: "#ffffff",
-	card: "#ffffff",
-	text: "#f57c00",
-	border: "#636363",
-	secondary: "#86868d",
-	link: "#039be5",
-	black: "#222222",
-	white: "#ffffff",
-	ghostWhite: "#f8f8ff",
-	lightGrey: "#f9f9f9",
-	red: "#fc5c65",
-	frame: "#aaa",
-	cancel: "#ebebeb",
-	count: 18,
+  primary: "#a965e0",
+  background: "#ffffff",
+  card: "#ffffff",
+  text: "#f57c00",
+  border: "#636363",
+  secondary: "#86868d",
+  link: "#039be5",
+  black: "#222222",
+  white: "#ffffff",
+  ghostWhite: "#f8f8ff",
+  lightGrey: "#f9f9f9",
+  red: "#fc5c65",
+  frame: "#aaa",
+  cancel: "#ebebeb",
+  count: 16,
 };
 // export const darkColorcontroller = () => {
 // 	let scheme = useColorScheme();
