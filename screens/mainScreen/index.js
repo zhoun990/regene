@@ -36,41 +36,43 @@ export const Main = () => {
   if (!panel) {
     return null;
   }
-  //   useEffect(() => {
-  //     if (!state.isInited) {
-  //       Alert.alert(i18n.t("hint"), i18n.t("hintText"));
-  //       dispatch(actions.initPanels());
-  //     }
-
-  //     (async () => {
-  //       if (Platform.OS !== "web") {
-  //         // await setTestDeviceIDAsync("EMULATOR");
-  //         await AdMobRewarded.setAdUnitID(
-  //           __DEV__ || !Constants.isDevice
-  //             ? "ca-app-pub-3940256099942544/5224354917"
-  //             : "ca-app-pub-4125138884903603/4614205616"
-  //         );
-  //         adRequest();
-  //       }
-  //     })();
-  //     Analytics.setCurrentScreen("xx_main_screen");
-  //   }, []);
   useEffect(() => {
-    const deadPanelCount = panel.filter((item) => item.isDead == true).length;
-    if (deadPanelCount == 16) {
-      // dispatch(actions.initPanels());
-      if (state.level !== 5) {
-        Alert.alert(
-          i18n.t("congratulations"),
-          `Level${state.level}${i18n.t("clearText")}`
-        );
-        Analytics.logEvent(`xx_quit_after_clear`);
-      } else {
-        Alert.alert(i18n.t("congratulations"), i18n.t("allStageClearText"));
-        Analytics.logEvent(`xx_quit_after_clear`);
-      }
+    // dispatch(actions.initPanels());
+    if (!state.isInited) {
+      Alert.alert(i18n.t("hint"), i18n.t("hintText"));
+      dispatch(actions.initPanels());
     }
+
+    (async () => {
+      if (Platform.OS !== "web") {
+        // await setTestDeviceIDAsync("EMULATOR");
+        await AdMobRewarded.setAdUnitID(
+          "ca-app-pub-4125138884903603/4614205616"
+          //   __DEV__ || !Constants.isDevice
+          //     ? "ca-app-pub-3940256099942544/5224354917"
+          //     : "ca-app-pub-4125138884903603/4614205616"
+        );
+        adRequest();
+      }
+    })();
+    Analytics.setCurrentScreen("xx_main_screen");
   }, []);
+  //   useEffect(() => {
+  //     const deadPanelCount = panel.filter((item) => item.isDead == true).length;
+  //     if (deadPanelCount == 16) {
+  //       // dispatch(actions.initPanels());
+  //       if (state.level !== 5) {
+  //         Alert.alert(
+  //           i18n.t("congratulations"),
+  //           `Level${state.level}${i18n.t("clearText")}`
+  //         );
+  //         Analytics.logEvent(`xx_quit_after_clear`);
+  //       } else {
+  //         Alert.alert(i18n.t("congratulations"), i18n.t("allStageClearText"));
+  //         Analytics.logEvent(`xx_quit_after_clear`);
+  //       }
+  //     }
+  //   }, []);
   const adRequest = async () => {
     await AdMobRewarded.requestAdAsync();
   };
@@ -293,9 +295,10 @@ export const Main = () => {
         // style={{ width: 200 }}
         // bannerSize="fullBanner"
         adUnitID={
-          __DEV__ || !Constants.isDevice
-            ? "ca-app-pub-3940256099942544/6300978111"
-            : "ca-app-pub-4125138884903603/8811297461"
+          "ca-app-pub-4125138884903603/8811297461"
+          //   __DEV__ || !Constants.isDevice
+          //     ? "ca-app-pub-3940256099942544/6300978111"
+          //     : "ca-app-pub-4125138884903603/8811297461"
         } // Test ID, Replace with your-admob-unit-id
         // servePersonalizedAds // true or false
         // onDidFailToReceiveAdWithError={this.bannerError}

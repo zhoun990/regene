@@ -47,7 +47,7 @@ export const resetPanelAds = (text) => {
             });
             await AdMobRewarded.showAdAsync().catch((err) => {
               Alert.alert(i18n.t("errorHappend"), i18n.t("errorRetry"));
-              Analytics.logEvent(`${err}`);
+              console.log("err", err);
             });
           },
         },

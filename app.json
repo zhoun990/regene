@@ -16,7 +16,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.ngm.regenerate",
-      "buildNumber": "1.0.0.1",
+      "buildNumber": "1.0.0.2",
       "supportsTablet": true,
       "userInterfaceStyle": "automatic",
       "config": {
