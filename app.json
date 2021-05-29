@@ -2,7 +2,12 @@
   "expo": {
     "name": "Re:Generate",
     "slug": "regene",
-    "version": "1.0.0",
+    "version": "1.0.1",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -16,14 +21,17 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.ngm.regenerate",
-      "buildNumber": "1.0.0.2",
+      "buildNumber": "1.0.1.0",
       "supportsTablet": true,
       "userInterfaceStyle": "automatic",
+      "appStoreUrl":"https://apps.apple.com/us/app/re-generate/id1569430018",
       "config": {
         "googleMobileAdsAppId": "ca-app-pub-4125138884903603~3005556577"
       },
       "infoPlist": {
-        "CFBundleAllowMixedLocalizations": true
+        "CFBundleAllowMixedLocalizations": true,
+        "CFBundleLocalizations" : ["en", "ja"],
+        "CFBundleDevelopmentRegion" : "en"
       },
       "googleServicesFile": "./GoogleService-Info.plist"
     },
