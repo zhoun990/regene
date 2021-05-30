@@ -8,8 +8,6 @@ import {
 } from "react-native";
 // import { Button } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
-import { Text, Button } from "../../custom/CustomComponents";
-import { actions } from "../../stores/datas";
 import {
 	AdMobBanner,
 	AdMobInterstitial,
@@ -17,17 +15,17 @@ import {
 	AdMobRewarded,
 	setTestDeviceIDAsync,
 } from "expo-ads-admob";
-import { resetPanelAds } from "../../components/resetPanelAds";
+import { resetPanelAds } from "../../../components/resetPanelAds";
 import * as Localization from "expo-localization";
 import i18n from "i18n-js";
-import { translations } from "../../utils/tranclations";
-import { Colors } from "../../utils/colors";
 import Constants from "expo-constants";
 import * as Analytics from "expo-firebase-analytics";
 import * as StoreReview from "expo-store-review";
 import * as Haptics from "expo-haptics";
+import { Text, Button } from "../../../custom/CustomComponents";
+import { actions } from "../../../stores/datas";
 
-export const Main = () => {
+export const MainScreen = () => {
 	const dispatch = useDispatch();
 	const state = useSelector((panel) => panel.datas);
 	const panel = useSelector((panel) => panel.datas.panel);

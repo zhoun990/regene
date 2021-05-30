@@ -46,7 +46,10 @@ export const resetPanelAds = (text) => {
 							AdMobRewarded.removeAllListeners();
 						});
 						await AdMobRewarded.showAdAsync().catch((err) => {
-							Alert.alert(i18n.t("errorHappend"), i18n.t("errorRetry"));
+							Alert.alert(i18n.t("notReadyToAd"), i18n.t("notReadyToAdText"));
+							// Alert.alert(i18n.t("errorHappend"), i18n.t("errorRetry"));
+							resolve(true);
+
 							console.log("err", err);
 						});
 						await AdMobRewarded.requestAdAsync();
