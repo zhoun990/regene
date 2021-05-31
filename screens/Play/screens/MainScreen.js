@@ -1,4 +1,4 @@
-import React, { useEffect, usepanel, createRef, useRef } from "react";
+import React, { useEffect, useState, createRef, useRef } from "react";
 import {
 	SafeAreaView,
 	TouchableOpacity,
@@ -18,14 +18,15 @@ import {
 import { resetPanelAds } from "../../../components/resetPanelAds";
 import * as Localization from "expo-localization";
 import i18n from "i18n-js";
+import { Colors } from "../../../utils/colors";
 import Constants from "expo-constants";
 import * as Analytics from "expo-firebase-analytics";
 import * as StoreReview from "expo-store-review";
 import * as Haptics from "expo-haptics";
 import { Text, Button } from "../../../custom/CustomComponents";
 import { actions } from "../../../stores/datas";
-
-export const MainScreen = () => {
+import { stageProvider } from "../../../src/stages";
+export const MainScreen = ({ navigation, route }) => {
 	const dispatch = useDispatch();
 	const state = useSelector((panel) => panel.datas);
 	const panel = useSelector((panel) => panel.datas.panel);
@@ -33,47 +34,40 @@ export const MainScreen = () => {
 	const remaining = Colors.count + 4 * state.level;
 	const adTurn =
 		remaining * (Math.floor(state.count / remaining) + 1) - 1 - state.count;
+	const params = route.params;
+	const [stage, setStage] = useState({});
+
 	if (!panel) {
 		return null;
 	}
 	useEffect(() => {
 		// dispatch(actions.initPanels());
-		if (!state.isInited) {
-			Alert.alert(i18n.t("hint"), i18n.t("hintText"));
-			dispatch(actions.initPanels());
+		// if (!state.isInited) {
+		// 	Alert.alert(i18n.t("hint"), i18n.t("hintText"));
+		// 	dispatch(actions.initPanels());
+		// }
+		const stageSata = stageProvider(params.name);
+		if (stageSata !== null) {
+			dispatch(actions.initPanels(stageSata));
 		}
+		setStage(stageSata);
 
-		(async () => {
-			if (Platform.OS !== "web") {
-				// await setTestDeviceIDAsync("EMULATOR");
-				await AdMobRewarded.setAdUnitID(
-					"ca-app-pub-4125138884903603/4614205616"
-					//   __DEV__ || !Constants.isDevice
-					//     ? "ca-app-pub-3940256099942544/5224354917"
-					//     : "ca-app-pub-4125138884903603/4614205616"
-				);
-				adRequest();
-				await AdMobRewarded.requestAdAsync();
-			}
-		})();
+		// (async () => {
+		// await setTestDeviceIDAsync("EMULATOR");
+		// await AdMobRewarded.setAdUnitID(
+		// 	// "ca-app-pub-4125138884903603/4614205616"
+		// 	__DEV__ || !Constants.isDevice
+		// 		? "ca-app-pub-3940256099942544/5224354917"
+		// 		: "ca-app-pub-4125138884903603/4614205616"
+		// );
+		// adRequest();
+		// await AdMobRewarded.requestAdAsync();
+		// })();
 		Analytics.setCurrentScreen("xx_main_screen");
 	}, []);
-	//   useEffect(() => {
-	//     const deadPanelCount = panel.filter((item) => item.isDead == true).length;
-	//     if (deadPanelCount == 16) {
-	//       // dispatch(actions.initPanels());
-	//       if (state.level !== 5) {
-	//         Alert.alert(
-	//           i18n.t("congratulations"),
-	//           `Level${state.level}${i18n.t("clearText")}`
-	//         );
-	//         Analytics.logEvent(`xx_quit_after_clear`);
-	//       } else {
-	//         Alert.alert(i18n.t("congratulations"), i18n.t("allStageClearText"));
-	//         Analytics.logEvent(`xx_quit_after_clear`);
-	//       }
-	//     }
-	//   }, []);
+	if (stage == null) {
+		return null;
+	}
 	const adRequest = async () => {
 		// await AdMobRewarded.requestAdAsync();
 	};
@@ -90,7 +84,7 @@ export const MainScreen = () => {
 
 			dispatch(actions.updateSinglePanel(n));
 			const deadPanelCount = panel.filter((item) => item.isDead == true).length;
-			if (deadPanelCount == 15) {
+			if (deadPanelCount == state.panel.length - 1) {
 				dispatch(actions.initPanels());
 
 				if (state.level !== 5) {
@@ -310,10 +304,10 @@ export const MainScreen = () => {
 					// style={{ width: 200 }}
 					// bannerSize="fullBanner"
 					adUnitID={
-						"ca-app-pub-4125138884903603/8811297461"
-						//   __DEV__ || !Constants.isDevice
-						//     ? "ca-app-pub-3940256099942544/6300978111"
-						//     : "ca-app-pub-4125138884903603/8811297461"
+						// "ca-app-pub-4125138884903603/8811297461"
+						__DEV__ || !Constants.isDevice
+							? "ca-app-pub-3940256099942544/6300978111"
+							: "ca-app-pub-4125138884903603/8811297461"
 					} // Test ID, Replace with your-admob-unit-id
 					// servePersonalizedAds // true or false
 					// onDidFailToReceiveAdWithError={this.bannerError}

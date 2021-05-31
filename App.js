@@ -73,7 +73,7 @@ const BaseTabs = () => {
 		<View style={{ flex: 1 }}>
 			<View
 				style={{
-					height: 150,
+					height: 130,
 					justifyContent: "center",
 					alignItems: "center",
 					backgroundColor: "white",

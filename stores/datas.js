@@ -5,23 +5,24 @@ import { RandomNumber } from "../api/RandomNumber";
 // Stateの初期状態
 const initialState = {
 	panel: [
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
-		{ isDead: false, restTurn: 5, defaultTurn: 5 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
+		{ isDead: false, restTurn: 5, count: 0 },
 	],
+	stage: {},
 	max: 8,
 	min: 3,
 	level: 1,
@@ -42,7 +43,20 @@ const slice = createSlice({
 				state.count++;
 			}
 			state.panel[action.payload].isDead = true;
-			state.panel[action.payload].restTurn = RandomNumber(state.max, state.min);
+			if (
+				state.stage.panel[action.payload].turn[
+					state.panel[action.payload].count + 1
+				]
+			) {
+				state.panel[action.payload].restTurn =
+					state.stage.panel[action.payload].turn[
+						state.panel[action.payload].count + 1
+					];
+				state.panel[action.payload].count++;
+			} else {
+				const random = RandomNumber(state.stage.max, state.stage.min);
+				state.panel[i].restTurn = random;
+			}
 			for (let i = 0; i < state.panel.length; i++) {
 				const panel = state.panel[i];
 
@@ -52,20 +66,34 @@ const slice = createSlice({
 			}
 			for (let i = 0; i < state.panel.length; i++) {
 				const panel = state.panel[i];
-
+				const stage = state.stage.panel[i];
 				if (!panel.isDead) {
 					if (panel.restTurn == 0) {
-						panel.restTurn = RandomNumber(state.max, state.min);
-
-						let list;
-						if (i == 3 || i == 7 || i == 11) {
-							list = [i - 4, i - 1, i + 4];
-						} else if (i == 4 || i == 8 || i == 12) {
-							list = [i - 4, i + 1, i + 4];
+						if (stage.turn[panel.count + 1]) {
+							panel.restTurn = stage.turn[panel.count + 1];
+							panel.count++;
 						} else {
-							list = [i - 4, i - 1, i + 1, i + 4];
+							const random = RandomNumber(state.stage.max, state.stage.min);
+							panel.restTurn = random;
 						}
-						list = list.filter((n) => 0 <= n && n <= 15);
+						let list;
+						const num = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+						if (
+							num.filter((item) => {
+								item * state.stage.row == i + 1;
+							}).length !== 0
+						) {
+							list = [i - state.stage.row, i - 1, i + state.stage.row];
+						} else if (
+							num.filter((item) => {
+								item * state.stage.row == i;
+							}).length !== 0
+						) {
+							list = [i - state.stage.row, i + 1, i + state.stage.row];
+						} else {
+							list = [i - state.stage.row, i - 1, i + 1, i + state.stage.row];
+						}
+						list = list.filter((n) => 0 <= n && n <= state.panel.length - 1);
 						list = list.filter((n) => state.panel[n].isDead);
 
 						//  list = list.filter(
@@ -79,13 +107,6 @@ const slice = createSlice({
 							console.log("🚀 ~ file: datas.js ~ line 56 ~ number", number);
 							state.panel[number].isDead = false;
 						}
-						console.log(
-							"🚀 ~ file: datas.js ~ line 1 ~ list2.length",
-							i,
-							list,
-							random,
-							list.length
-						);
 					}
 				}
 			}
@@ -93,13 +114,15 @@ const slice = createSlice({
 		initPanels: (state, action) => {
 			state.isInited = true;
 			state.count = 0;
-
+			state.stage = action.payload;
 			for (let i = 0; i < state.panel.length; i++) {
-				state.panel[i].isDead = false;
-				const random = RandomNumber(state.max, state.min);
-				console.log("🚀 ~ file: datas.js ~ line 80 ~ random", random);
-				state.panel[i].restTurn = random;
-				state.panel[i].defaultTurn = random;
+				state.panel[i].isDead = action.payload.panel[i].isDead;
+				if (action.payload.panel[i].turn[0]) {
+					state.panel[i].restTurn = action.payload.panel[i].turn[0];
+				} else {
+					const random = RandomNumber(action.payload.max, action.payload.min);
+					state.panel[i].restTurn = random;
+				}
 			}
 		},
 		levelHandler: (state, action) => {
@@ -119,7 +142,6 @@ const slice = createSlice({
 					const random = RandomNumber(state.max, state.min);
 					console.log("🚀 ~ file: datas.js ~ line 80 ~ random", random);
 					state.panel[i].restTurn = random;
-					state.panel[i].defaultTurn = random;
 				}
 			} else if (!action.payload && state.level > 1) {
 				state.max++;
@@ -136,7 +158,6 @@ const slice = createSlice({
 					const random = RandomNumber(state.max, state.min);
 					console.log("🚀 ~ file: datas.js ~ line 80 ~ random", random);
 					state.panel[i].restTurn = random;
-					state.panel[i].defaultTurn = random;
 				}
 			}
 		},
