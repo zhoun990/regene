@@ -13,11 +13,14 @@ import * as Analytics from "expo-firebase-analytics";
 import { Button, Text } from "../../../../custom/CustomComponents";
 import { actions } from "../../../../stores/datas";
 import { Colors } from "../../../../utils/colors";
+import { db } from "../../../../api/Firebase/firebase";
+import { stageProvider } from "../../../../src/stages";
 
 export const HomeScreen = ({ navigation }) => {
 	const dispatch = useDispatch();
 	const state = useSelector((state) => state.datas);
 	useEffect(() => {
+		// stageProvider("deploy");
 		Analytics.setCurrentScreen("xx_home_screen");
 	}, []);
 
@@ -29,7 +32,7 @@ export const HomeScreen = ({ navigation }) => {
 					onPress={() => {
 						navigation.navigate("StageSelect");
 					}}
-					buttonStyle={{ width: 200, height: 50 }}
+					style={{ width: 200, height: 50 }}
 				/>
 			</View>
 			<View

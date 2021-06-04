@@ -4,6 +4,7 @@ import { RandomNumber } from "../api/RandomNumber";
 
 // Stateの初期状態
 const initialState = {
+	loading: false,
 	panel: [
 		{ isDead: false, restTurn: 5, count: 0 },
 		{ isDead: false, restTurn: 5, count: 0 },
@@ -30,6 +31,46 @@ const initialState = {
 	count: 0,
 	askedReview2: false,
 	askedReview4: false,
+	isPlaying: false,
+	log: {},
+	stageName: "",
+	isLogedIn: false,
+	maxPoint: 100,
+	pointInterbal: 10,
+	en: 0,
+	card: {
+		TWX0RsngVofDjAdMmOVR: {
+			id: "TWX0RsngVofDjAdMmOVR",
+			n: [2, 0],
+			fragment: 30,
+			lv: 2,
+			params: [23, 44, 12, 32],
+			skill: "testSkill",
+			skillLv: 3,
+			passive_1: "testPassive1",
+			passive_2: "testPassive2",
+			inheritedPassive_1: "testInheritedPassive1",
+			inheritedPassive_2: "testInheritedPassive2",
+			inheritedCharacter_1: [1, 0],
+			inheritedCharacter_2: [1, 0],
+		},
+		"2IWs8oJlRtKprpJHnR4X": {
+			id: "2IWs8oJlRtKprpJHnR4X",
+			n: [1, 0],
+			fragment: 30,
+			lv: 2,
+			params: [30, 24, 26, 13],
+			skill: "testSkill",
+			skillLv: 3,
+			passive_1: "testPassive1",
+			passive_2: "testPassive2",
+			inheritedPassive_1: "testInheritedPassive1",
+			inheritedPassive_2: "testInheritedPassive2",
+			inheritedCharacter_1: [1, 0],
+			inheritedCharacter_2: [1, 0],
+		},
+		relocate: {},
+	},
 };
 
 const slice = createSlice({
@@ -55,7 +96,7 @@ const slice = createSlice({
 				state.panel[action.payload].count++;
 			} else {
 				const random = RandomNumber(state.stage.max, state.stage.min);
-				state.panel[i].restTurn = random;
+				state.panel[action.payload].restTurn = random;
 			}
 			for (let i = 0; i < state.panel.length; i++) {
 				const panel = state.panel[i];
@@ -110,56 +151,47 @@ const slice = createSlice({
 					}
 				}
 			}
+			var date = new Date();
+			var time = date.getTime();
+			const logPanel = [{ panel: state.panel, count: state.count, time: time }];
+			const newLog = state.log.data.concat(logPanel);
+			state.log = {
+				name: state.log.name,
+				max: state.log.max,
+				min: state.log.min,
+				data: newLog,
+			};
 		},
 		initPanels: (state, action) => {
-			state.isInited = true;
+			// state.isInited = true;
 			state.count = 0;
-			state.stage = action.payload;
-			for (let i = 0; i < state.panel.length; i++) {
-				state.panel[i].isDead = action.payload.panel[i].isDead;
-				if (action.payload.panel[i].turn[0]) {
-					state.panel[i].restTurn = action.payload.panel[i].turn[0];
+			state.stage = action.payload.stage;
+			state.isPlaying = true;
+			state.stageName = action.payload.name;
+			const array = [];
+			for (let i = 0; i < action.payload.stage.panel.length; i++) {
+				const isDead = action.payload.stage.panel[i].isDead;
+				let restTurn;
+				if (action.payload.stage.panel[i].turn[0]) {
+					restTurn = action.payload.stage.panel[i].turn[0];
 				} else {
-					const random = RandomNumber(action.payload.max, action.payload.min);
-					state.panel[i].restTurn = random;
+					const random = RandomNumber(
+						action.payload.stage.max,
+						action.payload.stage.min
+					);
+					restTurn = random;
 				}
+				array.push({ isDead: isDead, restTurn: restTurn, count: 0 });
 			}
-		},
-		levelHandler: (state, action) => {
-			state.count = 0;
-			if (action.payload && state.level < 5) {
-				state.max--;
-				state.level++;
-				if (state.level > 4) {
-					state.min = 1;
-				} else if (state.level > 2) {
-					state.min = 2;
-				} else {
-					state.min = 3;
-				}
-				for (let i = 0; i < state.panel.length; i++) {
-					state.panel[i].isDead = false;
-					const random = RandomNumber(state.max, state.min);
-					console.log("🚀 ~ file: datas.js ~ line 80 ~ random", random);
-					state.panel[i].restTurn = random;
-				}
-			} else if (!action.payload && state.level > 1) {
-				state.max++;
-				state.level--;
-				if (state.level > 4) {
-					state.min = 1;
-				} else if (state.level > 2) {
-					state.min = 2;
-				} else {
-					state.min = 3;
-				}
-				for (let i = 0; i < state.panel.length; i++) {
-					state.panel[i].isDead = false;
-					const random = RandomNumber(state.max, state.min);
-					console.log("🚀 ~ file: datas.js ~ line 80 ~ random", random);
-					state.panel[i].restTurn = random;
-				}
-			}
+			state.panel = array;
+			var date = new Date();
+			var time = date.getTime();
+			state.log = {
+				name: state.stageName,
+				max: state.stage.max,
+				min: state.stage.min,
+				data: [{ panel: state.panel, count: state.count, time: time }],
+			};
 		},
 
 		reviewHandler: (state, action) => {
@@ -173,6 +205,28 @@ const slice = createSlice({
 				state.askedReview4 = true;
 			} else if (action.payload == "5") {
 				// state.askedReview5 = true;
+			}
+		},
+		gameEnd: (state, action) => {
+			state.isPlaying = false;
+		},
+		login: (state, action) => {
+			state.isLogedIn = true;
+		},
+		setUser: (state, action) => {
+			state.user = action.payload;
+		},
+		setEn: (state, action) => {
+			state.en = action.payload;
+		},
+		setCharacter: (state, action) => {
+			state.card[action.payload.id] = action.payload;
+		},
+		loading: (state, action) => {
+			// state.loading = !state.loading;
+			state.loading = action.payload.loading;
+			if (action.payload.loading) {
+				state.relocate = action.payload.relocate;
 			}
 		},
 	},

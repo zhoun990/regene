@@ -26,29 +26,49 @@ import * as Haptics from "expo-haptics";
 import { Text, Button } from "../../../custom/CustomComponents";
 import { actions } from "../../../stores/datas";
 import { stageProvider } from "../../../src/stages";
+import { auth, db } from "../../../api/Firebase/firebase";
 export const MainScreen = ({ navigation, route }) => {
 	const dispatch = useDispatch();
 	const state = useSelector((panel) => panel.datas);
 	const panel = useSelector((panel) => panel.datas.panel);
-	const mapItem = [0, 1, 2, 3];
+
 	const remaining = Colors.count + 4 * state.level;
 	const adTurn =
 		remaining * (Math.floor(state.count / remaining) + 1) - 1 - state.count;
 	const params = route.params;
-	const [stage, setStage] = useState({});
+	const [stage, setStage] = useState(null);
+	const [rowLength, setRowLength] = useState(4);
+	const [columLength, setColumLength] = useState(4);
 
 	if (!panel) {
 		return null;
 	}
 	useEffect(() => {
+		dispatch(actions.loading(false));
 		// dispatch(actions.initPanels());
 		// if (!state.isInited) {
 		// 	Alert.alert(i18n.t("hint"), i18n.t("hintText"));
 		// 	dispatch(actions.initPanels());
 		// }
+		const mapItem1 = [];
+		const mapItem2 = [];
 		const stageSata = stageProvider(params.name);
 		if (stageSata !== null) {
-			dispatch(actions.initPanels(stageSata));
+			if (!state.isPlaying || state.stageName !== params.name) {
+				dispatch(actions.initPanels({ stage: stageSata, name: params.name }));
+			}
+			for (
+				let i = 0;
+				i < Math.floor(stageSata.panel.length / stageSata.row);
+				i++
+			) {
+				mapItem1.push(i);
+			}
+			for (let i = 0; i < stageSata.row; i++) {
+				mapItem2.push(i);
+			}
+			setColumLength(mapItem1);
+			setRowLength(mapItem2);
 		}
 		setStage(stageSata);
 
@@ -84,41 +104,52 @@ export const MainScreen = ({ navigation, route }) => {
 
 			dispatch(actions.updateSinglePanel(n));
 			const deadPanelCount = panel.filter((item) => item.isDead == true).length;
-			if (deadPanelCount == state.panel.length - 1) {
-				dispatch(actions.initPanels());
+			if (deadPanelCount == panel.length - 1) {
+				dispatch(actions.gameEnd());
 
-				if (state.level !== 5) {
-					if (state.level == 2 && !state.askedReview2) {
-						StoreReview.requestReview();
-						dispatch(actions.reviewHandler("2"));
-					} else if (state.level == 4 && !state.askedReview4) {
-						StoreReview.requestReview();
-						dispatch(actions.reviewHandler("4"));
-					}
-					Alert.alert(
-						i18n.t("congratulations"),
-						`Level${state.level}${i18n.t("clearText")}`
-					);
-					Analytics.logEvent(`xx_level_${state.level}_cleared`);
-				} else {
-					Alert.alert(i18n.t("congratulations"), i18n.t("allStageClearText"));
-					Analytics.logEvent(`xx_all_level_cleared`);
-				}
+				// if (state.level == 2 && !state.askedReview2) {
+				// 	StoreReview.requestReview();
+				// 	dispatch(actions.reviewHandler("2"));
+				// } else if (state.level == 4 && !state.askedReview4) {
+				// 	StoreReview.requestReview();
+				// 	dispatch(actions.reviewHandler("4"));
+				// }
+				Alert.alert(
+					i18n.t("congratulations"),
+					`Level${state.level}${i18n.t("clearText")}`,
+					[
+						{
+							text: "Next",
+							onPress: () => {
+								navigation.navigate("Ranking", {});
+								dispatch(
+									actions.loading({
+										loading: true,
+										relocate: {
+											screen: "Ranking",
+											params: {},
+										},
+									})
+								);
+							},
+						},
+					],
+					{ cancelable: false }
+				);
+				Analytics.logEvent(`xx_level_${state.level}_cleared`);
 			}
-		} else if (Platform.OS == "web" && state.level == 1) {
-			window.alert(
-				"If you want to play all contents of Re:Generate, install the app from AppStore"
-			);
 		} else {
-			resetPanelAds(i18n.t("timeup")).then((bool) => {
-				if (bool) {
-					dispatch(actions.updateSinglePanel(n));
-					adRequest();
-					Analytics.logEvent("xx_timeuped_and_watched_an_ad");
-				} else {
-					Analytics.logEvent("xx_timeuped_and_didnt_watched_an_ad");
-				}
-			});
+			dispatch(actions.updateSinglePanel(n));
+
+			// resetPanelAds(i18n.t("timeup")).then((bool) => {
+			// 	if (bool) {
+			// 		dispatch(actions.updateSinglePanel(n));
+			// 		adRequest();
+			// 		Analytics.logEvent("xx_timeuped_and_watched_an_ad");
+			// 	} else {
+			// 		Analytics.logEvent("xx_timeuped_and_didnt_watched_an_ad");
+			// 	}
+			// });
 		}
 	};
 	const reset = () => {
@@ -136,24 +167,24 @@ export const MainScreen = ({ navigation, route }) => {
 			});
 		}
 	};
-	const levelUp = () => {
-		if (Platform.OS == "web" && state.level == 1) {
-			window.alert(
-				"If you want to play all contents of Re:Generate, install the app from AppStore"
-			);
-		} else {
-			resetPanelAds(i18n.t("nextAds")).then((bool) => {
-				if (bool) {
-					Analytics.logEvent("xx_level_uped");
+	// const levelUp = () => {
+	// 	if (Platform.OS == "web" && state.level == 1) {
+	// 		window.alert(
+	// 			"If you want to play all contents of Re:Generate, install the app from AppStore"
+	// 		);
+	// 	} else {
+	// 		resetPanelAds(i18n.t("nextAds")).then((bool) => {
+	// 			if (bool) {
+	// 				Analytics.logEvent("xx_level_uped");
 
-					dispatch(actions.levelHandler(true));
-					adRequest();
-				} else {
-					Analytics.logEvent("xx_level_up_canceled");
-				}
-			});
-		}
-	};
+	// 				dispatch(actions.levelHandler(true));
+	// 				adRequest();
+	// 			} else {
+	// 				Analytics.logEvent("xx_level_up_canceled");
+	// 			}
+	// 		});
+	// 	}
+	// };
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
 			<View style={{ flex: 1, marginBottom: 20 }}>
@@ -169,68 +200,11 @@ export const MainScreen = ({ navigation, route }) => {
 						type="outline"
 						title={i18n.t("back")}
 						onPress={async () => {
-							dispatch(actions.navigate("A"));
+							dispatch(actions.gameEnd());
+							navigation.navigate("BaseTabs");
 						}}
 					/>
 					<Button title={i18n.t("reset")} onPress={reset} />
-					<View
-						style={{
-							height: 100,
-							flexDirection: "row",
-							// justifyContent: "space-between",
-							alignItems: "center",
-						}}
-					>
-						<Button
-							title="Lv. down"
-							type="outline"
-							style={{
-								width: 100,
-							}}
-							onPress={() => {
-								Alert.alert(
-									i18n.t("levelDownAlert"),
-									``,
-									[
-										{
-											text: i18n.t("levelDown"),
-											onPress: () => {
-												dispatch(actions.levelHandler(false));
-												Analytics.logEvent("xx_level_downed");
-											},
-										},
-										{
-											text: i18n.t("cancel"),
-											onPress: () => {
-												Analytics.logEvent("xx_level_down_canceled");
-											},
-										},
-									],
-									{ cancelable: true }
-								);
-							}}
-							disabled={state.level == 1}
-						/>
-
-						<View
-							style={{
-								width: 40,
-								justifyContent: "center",
-								alignItems: "center",
-							}}
-						>
-							<Text>Lv.{state.level}</Text>
-						</View>
-						<Button
-							title="Lv. up"
-							type="outline"
-							style={{
-								width: 100,
-							}}
-							onPress={levelUp}
-							disabled={state.level == 5}
-						/>
-					</View>
 				</View>
 				<View
 					style={{
@@ -273,10 +247,10 @@ export const MainScreen = ({ navigation, route }) => {
 						</View>
 					</View>
 				</View>
-				{mapItem.map((column, i) => (
+				{columLength.map((column, i) => (
 					<View key={i} style={{ flex: 1, flexDirection: "row" }}>
-						{mapItem.map((row, i) => {
-							const n = row + (column * 3 + column);
+						{rowLength.map((row, i) => {
+							const n = row + (column * (stage.row - 1) + column);
 							return (
 								<TouchableOpacity
 									key={i}

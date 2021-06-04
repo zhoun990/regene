@@ -12,6 +12,8 @@ import * as Linking from "expo-linking";
 import * as Analytics from "expo-firebase-analytics";
 import { Text, Button } from "../../../custom/CustomComponents";
 import { Colors } from "../../../utils/colors";
+import { auth } from "../../../api/Firebase/firebase";
+import { actions } from "../../../stores/datas";
 
 export const EntranceScreen = ({ navigation }) => {
 	const dispatch = useDispatch();
@@ -20,8 +22,15 @@ export const EntranceScreen = ({ navigation }) => {
 		Analytics.setCurrentScreen("xx_entrance_screen");
 	}, []);
 	const onPress = () => {
-		if (state.isInited) {
-			navigation.navigate("BaseTabs");
+		if (auth.currentUser.displayName) {
+			dispatch(
+				actions.loading({
+					loading: true,
+					relocate: { screen: "BaseTabs", params: {} },
+				})
+			);
+
+			// navigation.navigate("BaseTabs");
 		} else {
 			Alert.alert(
 				i18n.t("doAgree"),
@@ -30,7 +39,7 @@ export const EntranceScreen = ({ navigation }) => {
 					{
 						text: i18n.t("agree"),
 						onPress: () => {
-							navigation.navigate("BaseTabs");
+							navigation.navigate("SetUp");
 						},
 					},
 					{
@@ -42,24 +51,46 @@ export const EntranceScreen = ({ navigation }) => {
 		}
 	};
 	return (
-		<SafeAreaView style={{ flex: 1 }}>
-			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-				<Image
+		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.gray1 }}>
+			<View
+				style={{
+					flex: 1,
+
+					backgroundColor: Colors.primary,
+					marginTop: 20,
+					marginHorizontal: 20,
+					borderRadius: 20,
+					borderWidth: 2,
+					borderColor: Colors.purple1,
+				}}
+			>
+				<View
 					style={{
-						width: 300,
-						height: 300,
+						flex: 1,
+						justifyContent: "center",
+						alignItems: "center",
+						backgroundColor: "white",
+						margin: 5,
+						borderRadius: 20,
 					}}
-					source={require("../../../assets/icon_adaptive.png")}
-				/>
-				<View>
-					<Text style={{ fontSize: 33, color: "#7d0b98" }}>Re:Generate</Text>
+				>
+					<Image
+						style={{
+							width: 300,
+							height: 300,
+						}}
+						source={require("../../../assets/icon_adaptive.png")}
+					/>
+					<View>
+						<Text style={{ fontSize: 33, color: "#7d0b98" }}>Re:Generate</Text>
+					</View>
 				</View>
 			</View>
 			<View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
 				<Button
 					title="Start Game"
 					onPress={onPress}
-					buttonStyle={{ width: 200, height: 50 }}
+					style={{ width: 200, height: 50 }}
 				/>
 			</View>
 			<View
