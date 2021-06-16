@@ -1,7 +1,7 @@
 const stage = {
 	panel: [
-		{ isDead: true, turn: [34] },
-		{ isDead: true, turn: [34] },
+		{ isDead: false, turn: [34] },
+		{ isDead: false, turn: [34] },
 		{ isDead: true, turn: [34] },
 		{ isDead: true, turn: [34] },
 		{ isDead: false, turn: [34] },

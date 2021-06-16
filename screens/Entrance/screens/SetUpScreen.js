@@ -43,7 +43,7 @@ export const SetUpScreen = ({ navigation }) => {
 			setloading(true);
 			await userSetUp({ username: username })
 				.then(({ data }) => {
-					if (data == "succes") {
+					if (data == "success") {
 						auth.currentUser
 							.updateProfile({
 								displayName: username,

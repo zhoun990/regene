@@ -1,4 +1,10 @@
-import React, { useEffect, useState, createRef, useRef } from "react";
+import React, {
+	useEffect,
+	useState,
+	createRef,
+	useRef,
+	useCallback,
+} from "react";
 import {
 	SafeAreaView,
 	TouchableOpacity,
@@ -15,6 +21,7 @@ import { actions } from "../../../../stores/datas";
 import { Colors } from "../../../../utils/colors";
 import { db } from "../../../../api/Firebase/firebase";
 import { stageProvider } from "../../../../src/stages";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const HomeScreen = ({ navigation }) => {
 	const dispatch = useDispatch();
@@ -23,6 +30,7 @@ export const HomeScreen = ({ navigation }) => {
 		// stageProvider("deploy");
 		Analytics.setCurrentScreen("xx_home_screen");
 	}, []);
+	// useFocusEffect(useCallback(() => {}, []));
 
 	return (
 		<SafeAreaView style={{ flex: 1 }}>

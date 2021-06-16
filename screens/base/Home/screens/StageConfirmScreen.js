@@ -18,6 +18,7 @@ import { Colors } from "../../../../utils/colors";
 import { TouchableWithoutFeedback } from "react-native";
 import { functions } from "../../../../api/Firebase/firebase";
 import { actions } from "../../../../stores/datas";
+import { characterPicker } from "../../../../src/characterPicker";
 const enHandler = functions.httpsCallable("enHandler");
 
 export const StageConfirmScreen = ({ navigation, route }) => {
@@ -26,7 +27,15 @@ export const StageConfirmScreen = ({ navigation, route }) => {
 	const params = route.params;
 	const item = params.item;
 	const animation = React.useMemo(() => new Animated.Value(0), []);
+	const [team, setTeam] = useState([]);
 
+	useEffect(() => {
+		const array = [];
+		for (let c of state.team) {
+			array.push(Object.assign(state.card[c]));
+		}
+		setTeam(array);
+	}, []);
 	useEffect(() => {
 		Animated.timing(animation, {
 			toValue: 1,
@@ -128,57 +137,175 @@ export const StageConfirmScreen = ({ navigation, route }) => {
 				<View
 					style={{
 						flex: 1,
-						borderWidth: 0,
+						borderWidth: 1,
+						marginTop: 40,
 						// justifyContent: "center",
 						// alignItems: "center",
 					}}
 				>
 					<View
 						style={{
-							flex: 1,
-							borderWidth: 0,
-							justifyContent: "center",
-							alignItems: "center",
+							// flex: 1,
+
+							backgroundColor: Colors.skyblue2,
+							borderTopWidth: 7,
+							borderTopColor: Colors.skyblue3,
 						}}
 					>
-						<Forque style={{ fontSize: 30 }}>{item.stageName}</Forque>
+						<View
+							style={{
+								// flex: 1,
+								marginBottom: 7,
+								padding: 20,
+								justifyContent: "space-around",
+								alignItems: "center",
+								backgroundColor: Colors.skyblue1,
+								flexDirection: "row",
+							}}
+						>
+							<Forque style={{ fontSize: 40 }}>{item.stageName}</Forque>
+						</View>
 					</View>
 					<View
 						style={{
 							flex: 1,
-							flexDirection: "row",
+							// flexDirection: "row",
 							// justifyContent: "center",
 							// alignItems: "center",
+							backgroundColor: Colors.blue2,
+							borderBottomWidth: 7,
+							borderBottomColor: Colors.blue5,
 						}}
 					>
 						<View
 							style={{
 								flex: 1,
-								borderWidth: 1,
-								justifyContent: "center",
+								justifyContent: "flex-end",
 								alignItems: "center",
 							}}
 						>
-							<Forque style={{ fontSize: 25 }}>Use Energy {item.en}</Forque>
+							<Forque style={{ fontSize: 30 }}>Your Team</Forque>
+						</View>
+						<View
+							style={{
+								// flex: 1,
+								height: "32%",
+								flexDirection: "row",
+								backgroundColor: "#1e1821",
+								margin: 5,
+								marginBottom: 0,
+								borderRadius: 5,
+								borderWidth: 1,
+								borderColor: Colors.blue1,
+							}}
+						>
+							<View
+								style={{
+									flex: 1,
+									flexDirection: "row",
+									justifyContent: "center",
+									alignItems: "center",
+									backgroundColor: "#333841",
+									marginVertical: 10,
+									marginHorizontal: 7,
+									borderRadius: 5,
+									paddingHorizontal: 10,
+								}}
+							>
+								<View
+									style={{
+										flex: 1,
+										marginVertical: 10,
+
+										// alignItems: "center",
+										justifyContent: "space-around",
+										flexDirection: "row",
+									}}
+								>
+									{team.map((item, i) => (
+										<Image
+											key={i}
+											style={[
+												{
+													// flex: 1,
+													width: undefined,
+													height: "100%",
+													aspectRatio: 1,
+													marginRight: 4,
+												},
+												i == 0 && {
+													borderWidth: 1.5,
+													borderColor: Colors.red2,
+												},
+											]}
+											source={characterPicker[item.n[0]][item.n[1]].icon}
+										/>
+									))}
+
+									{team.length < 3 && (
+										<View
+											style={{
+												width: undefined,
+												height: "100%",
+												aspectRatio: 1,
+												marginRight: 4,
+												borderWidth: 1.5,
+												borderColor: Colors.secondary,
+											}}
+										/>
+									)}
+									{team.length < 4 && (
+										<View
+											style={{
+												width: undefined,
+												height: "100%",
+												aspectRatio: 1,
+												marginRight: 4,
+												borderWidth: 1.5,
+												borderColor: Colors.secondary,
+											}}
+										/>
+									)}
+								</View>
+							</View>
 						</View>
 						<View
 							style={{
 								flex: 1,
-								borderWidth: 1,
 								justifyContent: "center",
+								flexDirection: "row",
 								alignItems: "center",
 							}}
 						>
-							<Forque style={{ fontSize: 25 }}>
-								Reward : {String(item.reward)}
-							</Forque>
-							<Forque style={{ fontSize: 25 }}>
-								Earn gold : {String(item.gold)}
-							</Forque>
+							<View
+								style={{
+									flex: 1,
+									// borderWidth: 1,
+									justifyContent: "center",
+									alignItems: "center",
+								}}
+							>
+								<Forque style={{ fontSize: 20 }}>Use Energy {item.en}</Forque>
+							</View>
+							<View
+								style={{
+									flex: 1,
+									// borderWidth: 1,
+									justifyContent: "center",
+									alignItems: "center",
+								}}
+							>
+								<Forque style={{ fontSize: 20 }}>
+									Reward : {String(item.reward)}
+								</Forque>
+								<Forque style={{ fontSize: 20 }}>
+									Earn gold : {String(item.gold)}
+								</Forque>
+							</View>
 						</View>
 					</View>
 				</View>
-				<View style={{ flex: 1, borderWidth: 0 }}></View>
+				{/* <View style={{ flex: 1, borderWidth: 0 }}></View> */}
 				<View
 					style={{
 						height: 100,

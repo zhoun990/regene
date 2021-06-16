@@ -36,11 +36,12 @@ const initialState = {
 	stageName: "",
 	isLogedIn: false,
 	maxPoint: 100,
-	pointInterbal: 10,
+	pointInterval: 10,
 	en: 0,
+	team: ["gbPXeTFVXu43LXa8JgWN", "gz84TLYabKvgIYqwOhk4"],
 	card: {
-		TWX0RsngVofDjAdMmOVR: {
-			id: "TWX0RsngVofDjAdMmOVR",
+		gbPXeTFVXu43LXa8JgWN: {
+			id: "gbPXeTFVXu43LXa8JgWN",
 			n: [2, 0],
 			fragment: 30,
 			lv: 2,
@@ -54,8 +55,8 @@ const initialState = {
 			inheritedCharacter_1: [1, 0],
 			inheritedCharacter_2: [1, 0],
 		},
-		"2IWs8oJlRtKprpJHnR4X": {
-			id: "2IWs8oJlRtKprpJHnR4X",
+		gz84TLYabKvgIYqwOhk4: {
+			id: "gz84TLYabKvgIYqwOhk4",
 			n: [1, 0],
 			fragment: 30,
 			lv: 2,
@@ -69,8 +70,11 @@ const initialState = {
 			inheritedCharacter_1: [1, 0],
 			inheritedCharacter_2: [1, 0],
 		},
-		relocate: {},
 	},
+	resultHistory: [],
+	relocate: {},
+	stamina: 100,
+	activeSkill: "",
 };
 
 const slice = createSlice({
@@ -78,96 +82,182 @@ const slice = createSlice({
 	initialState,
 	reducers: {
 		updateSinglePanel: (state, action) => {
-			if (state.panel[action.payload].isDead) {
-				return state;
-			} else {
+			if (action.payload == "skip") {
 				state.count++;
-			}
-			state.panel[action.payload].isDead = true;
-			if (
-				state.stage.panel[action.payload].turn[
-					state.panel[action.payload].count + 1
-				]
-			) {
-				state.panel[action.payload].restTurn =
-					state.stage.panel[action.payload].turn[
-						state.panel[action.payload].count + 1
-					];
-				state.panel[action.payload].count++;
-			} else {
-				const random = RandomNumber(state.stage.max, state.stage.min);
-				state.panel[action.payload].restTurn = random;
-			}
-			for (let i = 0; i < state.panel.length; i++) {
-				const panel = state.panel[i];
-
-				if (!panel.isDead && panel.restTurn !== 0) {
-					panel.restTurn--;
+				state.stamina += 30;
+				for (let i = 0; i < state.panel.length; i++) {
+					const panel = state.panel[i];
+					if (!panel.isDead && panel.restTurn !== 0) {
+						panel.restTurn--;
+					}
 				}
-			}
-			for (let i = 0; i < state.panel.length; i++) {
-				const panel = state.panel[i];
-				const stage = state.stage.panel[i];
-				if (!panel.isDead) {
-					if (panel.restTurn == 0) {
-						if (stage.turn[panel.count + 1]) {
-							panel.restTurn = stage.turn[panel.count + 1];
-							panel.count++;
-						} else {
-							const random = RandomNumber(state.stage.max, state.stage.min);
-							panel.restTurn = random;
-						}
-						let list;
-						const num = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-						if (
-							num.filter((item) => {
-								item * state.stage.row == i + 1;
-							}).length !== 0
-						) {
-							list = [i - state.stage.row, i - 1, i + state.stage.row];
-						} else if (
-							num.filter((item) => {
-								item * state.stage.row == i;
-							}).length !== 0
-						) {
-							list = [i - state.stage.row, i + 1, i + state.stage.row];
-						} else {
-							list = [i - state.stage.row, i - 1, i + 1, i + state.stage.row];
-						}
-						list = list.filter((n) => 0 <= n && n <= state.panel.length - 1);
-						list = list.filter((n) => state.panel[n].isDead);
+				for (let i = 0; i < state.panel.length; i++) {
+					const panel = state.panel[i];
+					const stage = state.stage.panel[i];
+					if (!panel.isDead) {
+						if (panel.restTurn == 0) {
+							if (stage.turn[panel.count + 1]) {
+								panel.restTurn = stage.turn[panel.count + 1];
+								panel.count++;
+							} else {
+								const random = RandomNumber(state.stage.max, state.stage.min);
+								panel.restTurn = random;
+							}
+							let list;
+							const num = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+							if (
+								num.filter((item) => {
+									item * state.stage.row == i + 1;
+								}).length !== 0
+							) {
+								list = [i - state.stage.row, i - 1, i + state.stage.row];
+							} else if (
+								num.filter((item) => {
+									item * state.stage.row == i;
+								}).length !== 0
+							) {
+								list = [i - state.stage.row, i + 1, i + state.stage.row];
+							} else {
+								list = [i - state.stage.row, i - 1, i + 1, i + state.stage.row];
+							}
+							list = list.filter((n) => 0 <= n && n <= state.panel.length - 1);
+							list = list.filter((n) => state.panel[n].isDead);
 
-						//  list = list.filter(
-						// 	(n) =>
-						// 		(n == 4 * i - 1 ? n !== i + 1 : n == n) &&
-						// 		(n == 4 * i ? n !== i - 1 : n == n)
-						// );
-						const random = RandomNumber(list.length, 0);
-						if (list.length > 0) {
-							const number = list[random];
-							console.log("🚀 ~ file: datas.js ~ line 56 ~ number", number);
-							state.panel[number].isDead = false;
+							//  list = list.filter(
+							// 	(n) =>
+							// 		(n == 4 * i - 1 ? n !== i + 1 : n == n) &&
+							// 		(n == 4 * i ? n !== i - 1 : n == n)
+							// );
+							const random = RandomNumber(list.length, 0);
+							if (list.length > 0) {
+								const number = list[random];
+								console.log("🚀 ~ file: datas.js ~ line 56 ~ number", number);
+								state.panel[number].isDead = false;
+							}
 						}
 					}
 				}
+				var date = new Date();
+				var time = date.getTime();
+				const logPanel = [
+					{
+						panel: state.panel,
+						count: state.count,
+						time: time,
+						i: "skip",
+					},
+				];
+				const newLog = state.log.data.concat(logPanel);
+				state.log = {
+					stageName: state.log.stageName,
+					max: state.log.max,
+					min: state.log.min,
+					data: newLog,
+				};
+			} else if (action.payload.skill) {
+				if (action.payload.skill == "Two Panels Turn Over") {
+				} else if (action.payload.skill == "") {
+					state.activeSkill = action.payload.skill;
+				}
+			} else if (state.panel[action.payload].isDead) {
+			} else if (state.stamina >= state.panel[action.payload].restTurn) {
+				state.count++;
+				state.panel[action.payload].isDead = true;
+				state.stamina = state.stamina - state.panel[action.payload].restTurn;
+				if (
+					state.stage.panel[action.payload].turn[
+						state.panel[action.payload].count + 1
+					]
+				) {
+					state.panel[action.payload].restTurn =
+						state.stage.panel[action.payload].turn[
+							state.panel[action.payload].count + 1
+						];
+					state.panel[action.payload].count++;
+				} else {
+					const random = RandomNumber(state.stage.max, state.stage.min);
+					state.panel[action.payload].restTurn = random;
+				}
+				for (let i = 0; i < state.panel.length; i++) {
+					const panel = state.panel[i];
+
+					if (!panel.isDead && panel.restTurn !== 0) {
+						panel.restTurn--;
+					}
+				}
+				for (let i = 0; i < state.panel.length; i++) {
+					const panel = state.panel[i];
+					const stage = state.stage.panel[i];
+					if (!panel.isDead) {
+						if (panel.restTurn == 0) {
+							if (stage.turn[panel.count + 1]) {
+								panel.restTurn = stage.turn[panel.count + 1];
+								panel.count++;
+							} else {
+								const random = RandomNumber(state.stage.max, state.stage.min);
+								panel.restTurn = random;
+							}
+							let list;
+							const num = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+							if (
+								num.filter((item) => {
+									item * state.stage.row == i + 1;
+								}).length !== 0
+							) {
+								list = [i - state.stage.row, i - 1, i + state.stage.row];
+							} else if (
+								num.filter((item) => {
+									item * state.stage.row == i;
+								}).length !== 0
+							) {
+								list = [i - state.stage.row, i + 1, i + state.stage.row];
+							} else {
+								list = [i - state.stage.row, i - 1, i + 1, i + state.stage.row];
+							}
+							list = list.filter((n) => 0 <= n && n <= state.panel.length - 1);
+							list = list.filter((n) => state.panel[n].isDead);
+
+							//  list = list.filter(
+							// 	(n) =>
+							// 		(n == 4 * i - 1 ? n !== i + 1 : n == n) &&
+							// 		(n == 4 * i ? n !== i - 1 : n == n)
+							// );
+							const random = RandomNumber(list.length, 0);
+							if (list.length > 0) {
+								const number = list[random];
+								console.log("🚀 ~ file: datas.js ~ line 56 ~ number", number);
+								state.panel[number].isDead = false;
+							}
+						}
+					}
+				}
+				var date = new Date();
+				var time = date.getTime();
+				const logPanel = [
+					{
+						panel: state.panel,
+						count: state.count,
+						time: time,
+						i: action.payload,
+					},
+				];
+				const newLog = state.log.data.concat(logPanel);
+				state.log = {
+					stageName: state.log.stageName,
+					max: state.log.max,
+					min: state.log.min,
+					data: newLog,
+				};
 			}
-			var date = new Date();
-			var time = date.getTime();
-			const logPanel = [{ panel: state.panel, count: state.count, time: time }];
-			const newLog = state.log.data.concat(logPanel);
-			state.log = {
-				name: state.log.name,
-				max: state.log.max,
-				min: state.log.min,
-				data: newLog,
-			};
 		},
 		initPanels: (state, action) => {
+			console.log("🚀 ~ file: datas.js ~ line 175 ~ initPanels");
 			// state.isInited = true;
 			state.count = 0;
 			state.stage = action.payload.stage;
 			state.isPlaying = true;
 			state.stageName = action.payload.name;
+			state.stamina = 100;
 			const array = [];
 			for (let i = 0; i < action.payload.stage.panel.length; i++) {
 				const isDead = action.payload.stage.panel[i].isDead;
@@ -187,7 +277,7 @@ const slice = createSlice({
 			var date = new Date();
 			var time = date.getTime();
 			state.log = {
-				name: state.stageName,
+				stageName: state.stageName,
 				max: state.stage.max,
 				min: state.stage.min,
 				data: [{ panel: state.panel, count: state.count, time: time }],
@@ -208,6 +298,7 @@ const slice = createSlice({
 			}
 		},
 		gameEnd: (state, action) => {
+			console.log("🚀 ~ file: datas.js ~ line 220 ~ gameEnd");
 			state.isPlaying = false;
 		},
 		login: (state, action) => {
@@ -227,6 +318,29 @@ const slice = createSlice({
 			state.loading = action.payload.loading;
 			if (action.payload.loading) {
 				state.relocate = action.payload.relocate;
+			}
+		},
+		setTeam: (state, action) => {
+			// state.loading = !state.loading;
+			const array = [];
+			for (let i = 0; i < action.payload.length; i++) {
+				array.push(action.payload[i].id);
+			}
+			state.team = array;
+		},
+		addResult: (state, action) => {
+			state.resultHistory = action.payload;
+		},
+		resultHistory: (state, action) => {
+			state.resultHistory[state.resultHistory.length] = action.payload;
+		},
+		setStamina: (state, action) => {
+			if (state.stamina + action.payload < 0) {
+				state.stamina = 0;
+			} else if (state.stamina + action.payload > 100) {
+				state.stamina = 100;
+			} else {
+				state.stamina += action.payload;
 			}
 		},
 	},

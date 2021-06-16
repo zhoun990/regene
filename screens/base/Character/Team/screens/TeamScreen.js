@@ -7,6 +7,7 @@ import {
 	Image,
 	FlatList,
 	Dimensions,
+	TouchableWithoutFeedback,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import i18n from "i18n-js";
@@ -17,28 +18,33 @@ import { actions } from "../../../../../stores/datas";
 import { Colors } from "../../../../../utils/colors";
 import { db } from "../../../../../api/Firebase/firebase";
 import { characterPicker } from "../../../../../src/characterPicker";
-import { TouchableWithoutFeedback } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
-export const CharacterListScreen = ({ navigation }) => {
+export const TeamScreen = ({ navigation }) => {
 	const dispatch = useDispatch();
 	const state = useSelector((state) => state.datas);
 	const { width, height, scale } = Dimensions.get("window");
 	const iconWidth = (width - 10) / 5 - 10;
 	const [cardData, setCardData] = useState(null);
 	const [cardArray, setCardArray] = useState([]);
+	const [team, setTeam] = useState([]);
 	const [selecting, setSelecting] = useState(0);
 	const [showDetail, setShowDetail] = useState(true);
-
+	useEffect(() => {
+		team.length > 0 && dispatch(actions.setTeam(team));
+	}, [team]);
 	useEffect(() => {
 		const array = [];
-
+		const array2 = [];
 		for (let card in state.card) {
 			array.push(state.card[card]);
 		}
+		for (let c of state.team) {
+			array2.push(Object.assign(state.card[c]));
+		}
 
+		setTeam(array2);
 		setCardArray(array);
-
 		setCardData(array[0]);
 		// Analytics.setCurrentScreen("xx_home_screen");
 	}, []);
@@ -52,39 +58,186 @@ export const CharacterListScreen = ({ navigation }) => {
 				style={{
 					height: 70,
 					flexDirection: "row",
-					backgroundColor: "#1e1821",
-					margin: 5,
-					marginBottom: 0,
-					borderRadius: 5,
-					borderWidth: 1,
-					borderColor: Colors.blue1,
 				}}
 			>
 				<View
 					style={{
-						flex: 1,
 						flexDirection: "row",
-						justifyContent: "center",
-						alignItems: "center",
-						backgroundColor: "#333841",
-						marginVertical: 10,
-						marginHorizontal: 5,
+						backgroundColor: "#1e1821",
+						margin: 5,
+						marginBottom: 0,
 						borderRadius: 5,
-						paddingHorizontal: 10,
+						borderWidth: 1,
+						borderColor: Colors.blue1,
 					}}
 				>
-					<Button
-						style={{ width: 100 }}
-						title="Back"
-						onPress={() => {
-							navigation.navigate("Character");
-						}}
-					/>
-					{/* </View> */}
 					<View
-						style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+						style={{
+							flexDirection: "row",
+							justifyContent: "center",
+							alignItems: "center",
+							backgroundColor: "#333841",
+							marginVertical: 10,
+							marginHorizontal: 5,
+							borderRadius: 5,
+							paddingHorizontal: 10,
+						}}
 					>
-						<Forque>{"Character List"}</Forque>
+						<Button
+							style={{ width: 100 }}
+							title="Back"
+							onPress={() => {
+								navigation.navigate("Character");
+							}}
+						/>
+						{/* </View> */}
+						<View
+							style={{
+								flex: 1,
+								// alignItems: "center",
+								// justifyContent: "center",
+								flexDirection: "row",
+							}}
+						></View>
+					</View>
+				</View>
+				<View
+					style={{
+						flex: 1,
+						flexDirection: "row",
+						backgroundColor: "#1e1821",
+						margin: 5,
+						marginBottom: 0,
+						borderRadius: 5,
+						borderWidth: 1,
+						borderColor: Colors.blue1,
+					}}
+				>
+					<View
+						style={{
+							flex: 1,
+							flexDirection: "row",
+							justifyContent: "center",
+							alignItems: "center",
+							backgroundColor: "#333841",
+							marginVertical: 5,
+							marginHorizontal: 5,
+							borderRadius: 5,
+							paddingHorizontal: 10,
+						}}
+					>
+						<View
+							style={{
+								flex: 1,
+								// alignItems: "center",
+								justifyContent: "center",
+								flexDirection: "row",
+							}}
+						>
+							{team.map((item, i) => (
+								<Image
+									key={i}
+									style={[
+										{
+											// flex: 1,
+											width: undefined,
+											height: "100%",
+											aspectRatio: 1,
+											marginRight: 4,
+										},
+										i == 0 && {
+											borderWidth: 1.5,
+											borderColor: Colors.red2,
+										},
+									]}
+									source={characterPicker[item.n[0]][item.n[1]].icon}
+								/>
+							))}
+							{team.length < 1 && (
+								<View
+									style={{
+										width: undefined,
+										height: "100%",
+										aspectRatio: 1,
+										marginRight: 4,
+										borderWidth: 1.5,
+										borderColor: Colors.red2,
+									}}
+								/>
+							)}
+							{team.length < 2 && (
+								<View
+									style={{
+										width: undefined,
+										height: "100%",
+										aspectRatio: 1,
+										marginRight: 4,
+										borderWidth: 1.5,
+										borderColor: Colors.secondary,
+									}}
+								/>
+							)}
+							{team.length < 3 && (
+								<View
+									style={{
+										width: undefined,
+										height: "100%",
+										aspectRatio: 1,
+										marginRight: 4,
+										borderWidth: 1.5,
+										borderColor: Colors.secondary,
+									}}
+								/>
+							)}
+							{team.length < 4 && (
+								<View
+									style={{
+										width: undefined,
+										height: "100%",
+										aspectRatio: 1,
+										marginRight: 4,
+										borderWidth: 1.5,
+										borderColor: Colors.secondary,
+									}}
+								/>
+							)}
+							{/* {team[1] && (
+								<Image
+									style={[
+										{
+											// flex: 1,
+											width: undefined,
+											height: "100%",
+											aspectRatio: 1,
+											// margin: 4,
+										},
+										// index == selecting && {
+										// 	borderWidth: 2,
+										// 	borderColor: Colors.yellow1,
+										// },
+									]}
+									source={characterPicker[team[1].n[0]][team[1].n[1]].icon}
+								/>
+							)}
+							{team[2] && (
+								<Image
+									style={[
+										{
+											// flex: 1,
+											width: undefined,
+											height: "100%",
+											aspectRatio: 1,
+											// margin: 4,
+										},
+										// index == selecting && {
+										// 	borderWidth: 2,
+										// 	borderColor: Colors.yellow1,
+										// },
+									]}
+									source={characterPicker[team[2].n[0]][team[2].n[1]].icon}
+								/>
+							)} */}
+						</View>
 					</View>
 				</View>
 			</View>
@@ -472,7 +625,20 @@ export const CharacterListScreen = ({ navigation }) => {
 					renderItem={({ item, index }) => {
 						return (
 							<TouchableWithoutFeedback
-								onPress={() => (setCardData(item), setSelecting(index))}
+								onPress={() => {
+									setCardData(item);
+									setSelecting(index);
+									if (selecting == index) {
+										if (team.length == 4) {
+										} else if (
+											team.filter((n) => n.id == item.id).length == 0
+										) {
+											setTeam(team.concat(item));
+										} else {
+											setTeam(team.filter((n) => n.id !== item.id));
+										}
+									}
+								}}
 								onLongPress={() => {
 									setShowDetail(!showDetail);
 									setCardData(item), setSelecting(index);

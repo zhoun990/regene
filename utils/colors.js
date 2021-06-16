@@ -21,6 +21,7 @@ export const Colors = {
 	blue2: "#0598ff",
 	blue3: "#a2fafc",
 	blue4: "#0059ad",
+	blue5: "#03579b",
 	yellow1: "#febb06",
 	yellow2: "#ffa400",
 	yellow3: "#ffff63",
@@ -29,6 +30,12 @@ export const Colors = {
 	gray1: "#2e3f54",
 	gold1: "#fbb22f",
 	purple1: "#a93cfa",
+	red1: "#e9898d",
+	red2: "#ab3d3b",
+	red3: "#e72926",
+	skyblue1: "#91bbe2",
+	skyblue2: "#446f95",
+	skyblue3: "#b4dbff",
 };
 // export const darkColorcontroller = () => {
 // 	let scheme = useColorScheme();

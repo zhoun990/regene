@@ -42,6 +42,7 @@ import { navigationTheme } from "./utils/navigationTheme";
 import { SetUpScreen } from "./screens/Entrance/screens/SetUpScreen";
 import { Animated } from "react-native";
 import { Colors } from "./utils/colors";
+import { TeamScreen } from "./screens/base/Character/Team/screens/TeamScreen";
 //Screen end
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -77,6 +78,8 @@ function Router() {
 	const [user, setUser] = useState(null);
 	const [isReady, setIsReady] = useState(false);
 	const [isSplashAnimationComplete, setAnimationComplete] = useState(false);
+	const [loadingText, setLoadingText] = useState("   ");
+	const [loadingTextInterval, setLoadingTextInterval] = useState(null);
 
 	useEffect(() => {
 		dispatch(actions.loading(false));
@@ -96,6 +99,9 @@ function Router() {
 					},
 				})
 			);
+		(async () => {
+			isReady && (await SplashScreen.hideAsync());
+		})();
 	}, [isReady]);
 	useEffect(() => {
 		const unsubscribeAuth = auth.onAuthStateChanged(async (authUser) => {
@@ -108,11 +114,6 @@ function Router() {
 		// unsubscribe auth listener on unmount
 		return unsubscribeAuth;
 	}, []);
-	useEffect(() => {
-		(async () => {
-			isReady && (await SplashScreen.hideAsync());
-		})();
-	}, [isReady]);
 
 	useEffect(() => {
 		if (user) {
@@ -152,8 +153,8 @@ function Router() {
 		}
 	}, [state]);
 	useEffect(() => {
-		(async () => {})();
 		if (loading && isSplashAnimationComplete) {
+			loadingTextHandler(true);
 			Animated.timing(animation, {
 				toValue: 1,
 				duration: 300,
@@ -163,7 +164,6 @@ function Router() {
 					state.relocate.screen,
 					state.relocate.params
 				);
-
 				finished && setAnimationComplete(false);
 			});
 		}
@@ -175,10 +175,38 @@ function Router() {
 				duration: 300,
 				useNativeDriver: true,
 			}).start(({ finished }) => {
+				loadingTextHandler(false);
 				finished && setAnimationComplete(true);
 			});
 		}
 	}, [loading, isSplashAnimationComplete]);
+	const loadingTextHandler = (bool) => {
+		let i = 0;
+		const setLoadingTextFunction = (loadingText) => {
+			i++;
+			if (i == 1) {
+				setLoadingText(".  ");
+			} else if (i == 2) {
+				setLoadingText(".. ");
+			} else if (i == 3) {
+				setLoadingText("...");
+			} else if (i == 4) {
+				i = 0;
+				setLoadingText("   ");
+			}
+		};
+		if (bool) {
+			const interval = setInterval(
+				() => setLoadingTextFunction(loadingText),
+				500
+			);
+			setLoadingTextInterval(interval);
+		} else {
+			clearInterval(loadingTextInterval);
+			setLoadingText("   ");
+		}
+	};
+
 	if (!isReady) {
 		return (
 			<View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -210,7 +238,7 @@ function Router() {
 						},
 					]}
 				>
-					<Forque style={{ fontSize: 50 }}>Loading...</Forque>
+					<Forque style={{ fontSize: 50 }}>Loading{loadingText}</Forque>
 					{/* <Animated.Image
 						style={{
 
@@ -248,6 +276,9 @@ function Router() {
 const BaseTabs = () => {
 	const state = useSelector((state) => state.datas);
 	const user = useSelector((state) => state.datas.user);
+	if (!user) {
+		return null;
+	}
 	const dispatch = useDispatch();
 	const [minutes, setMinutes] = useState("00");
 	const [seconds, setSeconds] = useState("00");
@@ -256,7 +287,7 @@ const BaseTabs = () => {
 	const [isReady, setIsReady] = useState(false);
 
 	const maxPoint = 100;
-	const pointInterbal = 10;
+	const pointInterval = 10;
 	useEffect(() => {
 		const intervalId = setInterval(calcTime, 1000);
 		init !== null && clearInterval(init);
@@ -271,7 +302,7 @@ const BaseTabs = () => {
 		const timeDef = Math.floor(Date.now() / 1000) - pointUpdateTime.seconds;
 
 		if (p < maxPoint) {
-			const caledPoint = Math.floor(timeDef / 60 / pointInterbal) + p;
+			const caledPoint = Math.floor(timeDef / 60 / pointInterval) + p;
 			caledPoint >= maxPoint ? (p = maxPoint) : (p = caledPoint);
 		}
 		setPoint(p);
@@ -283,10 +314,10 @@ const BaseTabs = () => {
 		}
 		setSeconds(s);
 
-		if (m > pointInterbal) {
-			m = m - pointInterbal * Math.floor(m / pointInterbal);
+		if (m > pointInterval) {
+			m = m - pointInterval * Math.floor(m / pointInterval);
 		}
-		m = String(pointInterbal - 1 - m);
+		m = String(pointInterval - 1 - m);
 		if (m.length == 1) {
 			m = "0" + m;
 		}
@@ -342,16 +373,16 @@ const BaseTabs = () => {
 											flex: 1,
 										}}
 									>
-										<Text
+										<Forque
 											style={{
-												fontSize: 18,
+												fontSize: 23,
 												fontWeight: "800",
 												flex: 1,
 												// marginRight: 10,
 											}}
 										>
 											Energy
-										</Text>
+										</Forque>
 									</View>
 									<View
 										style={{
@@ -361,9 +392,9 @@ const BaseTabs = () => {
 											flex: 1,
 										}}
 									>
-										<Text
+										<Forque
 											style={{
-												fontSize: 15,
+												fontSize: 20,
 												fontWeight: "800",
 
 												// marginRight: 10,
@@ -372,21 +403,21 @@ const BaseTabs = () => {
 										>
 											{Math.floor(point / maxPoint) !== 1 &&
 												minutes + ":" + seconds}
-										</Text>
+										</Forque>
 									</View>
 									<View
 										style={{
 											alignItems: "center",
 										}}
 									>
-										<Text
+										<Forque
 											style={{
-												fontSize: 17,
+												fontSize: 23,
 												fontWeight: "800",
 											}}
 										>
 											{point} / {maxPoint}
-										</Text>
+										</Forque>
 									</View>
 								</View>
 								<View
@@ -408,7 +439,8 @@ const BaseTabs = () => {
 											// justifyContent: "center",
 											flexDirection: "row",
 											height: 10,
-											width: `${(point / maxPoint) * 100}}%`,
+											width:
+												point < 100 ? `${(point / maxPoint) * 100}}%` : "100%",
 										}}
 									></View>
 								</View>
@@ -447,11 +479,7 @@ const BaseTabs = () => {
 					</View>
 				</View>
 				<Tab.Navigator>
-					<Tab.Screen
-						name="HomeScreens"
-						component={HomeScreens}
-						options={{ cardStyle: { backgroundColor: "blue" } }}
-					/>
+					<Tab.Screen name="HomeScreens" component={HomeScreens} />
 					<Tab.Screen name="CharacterScreens" component={CharacterScreens} />
 				</Tab.Navigator>
 			</SafeAreaView>
@@ -478,7 +506,7 @@ const CharacterScreens = () => {
 		>
 			<Stack.Screen name="Character" component={CharacterScreen} />
 			<Stack.Screen name="CharacterList" component={CharacterListScreen} />
-			<Stack.Screen name="StageConfirm" component={StageConfirmScreen} />
+			<Stack.Screen name="Team" component={TeamScreen} />
 		</Stack.Navigator>
 	);
 };

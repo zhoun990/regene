@@ -5,6 +5,10 @@ import {
 	View,
 	Alert,
 	Platform,
+	Image,
+	Modal,
+	TouchableWithoutFeedback,
+	Animated,
 } from "react-native";
 // import { Button } from "react-native-elements";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,10 +27,18 @@ import Constants from "expo-constants";
 import * as Analytics from "expo-firebase-analytics";
 import * as StoreReview from "expo-store-review";
 import * as Haptics from "expo-haptics";
-import { Text, Button } from "../../../custom/CustomComponents";
+import {
+	Text,
+	Button,
+	Forque,
+	ModalOneButtonWithCancel,
+} from "../../../custom/CustomComponents";
 import { actions } from "../../../stores/datas";
 import { stageProvider } from "../../../src/stages";
 import { auth, db } from "../../../api/Firebase/firebase";
+import { characterPicker } from "../../../src/characterPicker";
+import Icon from "react-native-vector-icons/Ionicons";
+
 export const MainScreen = ({ navigation, route }) => {
 	const dispatch = useDispatch();
 	const state = useSelector((panel) => panel.datas);
@@ -39,10 +51,23 @@ export const MainScreen = ({ navigation, route }) => {
 	const [stage, setStage] = useState(null);
 	const [rowLength, setRowLength] = useState(4);
 	const [columLength, setColumLength] = useState(4);
+	const [team, setTeam] = useState([]);
+	const [modalVisible, setModalVisible] = useState(false);
+	const [modalVisible2, setModalVisible2] = useState(false);
+	const [modalVisible3, setModalVisible3] = useState(false);
+	const animation = React.useMemo(() => new Animated.Value(0), []);
 
+	useEffect(() => {
+		const array = [];
+		for (let c of state.team) {
+			array.push(Object.assign(state.card[c]));
+		}
+		setTeam(array);
+	}, []);
 	if (!panel) {
 		return null;
 	}
+
 	useEffect(() => {
 		dispatch(actions.loading(false));
 		// dispatch(actions.initPanels());
@@ -100,43 +125,47 @@ export const MainScreen = ({ navigation, route }) => {
 	};
 	const onPress = (n) => {
 		if (adTurn !== 0) {
-			Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+			if (!panel[n].isDead) {
+				Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-			dispatch(actions.updateSinglePanel(n));
-			const deadPanelCount = panel.filter((item) => item.isDead == true).length;
-			if (deadPanelCount == panel.length - 1) {
-				dispatch(actions.gameEnd());
-
-				// if (state.level == 2 && !state.askedReview2) {
-				// 	StoreReview.requestReview();
-				// 	dispatch(actions.reviewHandler("2"));
-				// } else if (state.level == 4 && !state.askedReview4) {
-				// 	StoreReview.requestReview();
-				// 	dispatch(actions.reviewHandler("4"));
-				// }
-				Alert.alert(
-					i18n.t("congratulations"),
-					`Level${state.level}${i18n.t("clearText")}`,
-					[
-						{
-							text: "Next",
-							onPress: () => {
-								navigation.navigate("Ranking", {});
-								dispatch(
-									actions.loading({
-										loading: true,
-										relocate: {
-											screen: "Ranking",
-											params: {},
-										},
-									})
-								);
-							},
-						},
-					],
-					{ cancelable: false }
+				dispatch(actions.updateSinglePanel(n));
+				const deadPanelCount =
+					panel.filter((item) => item.isDead == true).length + 1;
+				console.log(
+					"🚀 ~ file: mainScreen.js ~ line 108 ~ onPress ~ deadPanelCount",
+					deadPanelCount
 				);
-				Analytics.logEvent(`xx_level_${state.level}_cleared`);
+				if (deadPanelCount == panel.length) {
+					// if (state.level == 2 && !state.askedReview2) {
+					// 	StoreReview.requestReview();
+					// 	dispatch(actions.reviewHandler("2"));
+					// } else if (state.level == 4 && !state.askedReview4) {
+					// 	StoreReview.requestReview();
+					// 	dispatch(actions.reviewHandler("4"));
+					// }
+					Alert.alert(
+						i18n.t("congratulations"),
+						`Level${state.level}${i18n.t("clearText")}`,
+						[
+							{
+								text: "Next",
+								onPress: () => {
+									dispatch(
+										actions.loading({
+											loading: true,
+											relocate: {
+												screen: "Ranking",
+												params: {},
+											},
+										})
+									);
+								},
+							},
+						],
+						{ cancelable: false }
+					);
+					Analytics.logEvent(`xx_level_${state.level}_cleared`);
+				}
 			}
 		} else {
 			dispatch(actions.updateSinglePanel(n));
@@ -167,44 +196,270 @@ export const MainScreen = ({ navigation, route }) => {
 			});
 		}
 	};
-	// const levelUp = () => {
-	// 	if (Platform.OS == "web" && state.level == 1) {
-	// 		window.alert(
-	// 			"If you want to play all contents of Re:Generate, install the app from AppStore"
-	// 		);
-	// 	} else {
-	// 		resetPanelAds(i18n.t("nextAds")).then((bool) => {
-	// 			if (bool) {
-	// 				Analytics.logEvent("xx_level_uped");
 
-	// 				dispatch(actions.levelHandler(true));
-	// 				adRequest();
-	// 			} else {
-	// 				Analytics.logEvent("xx_level_up_canceled");
-	// 			}
-	// 		});
-	// 	}
-	// };
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: "#f0f0f0" }}>
-			<View style={{ flex: 1, marginBottom: 20 }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: Colors.gray1 }}>
+			<ModalOneButtonWithCancel
+				visible={modalVisible2}
+				setModalVisible={setModalVisible2}
+				text="Are you sure ?"
+				title="Give up"
+				onPress={() => {
+					setModalVisible(false);
+					dispatch(
+						actions.loading({
+							loading: true,
+							relocate: {
+								screen: "BaseTabs",
+								params: {
+									screen: "HomeScreens",
+									params: { screen: "Home" },
+								},
+							},
+						})
+					);
+					navigation.navigate("BaseTabs");
+				}}
+			/>
+			<Modal
+				animationType="none"
+				transparent={true}
+				visible={modalVisible}
+				onRequestClose={() => {
+					Animated.timing(animation, {
+						toValue: 0,
+						duration: 100,
+						useNativeDriver: true,
+					}).start(({ finished }) => {});
+				}}
+				onShow={() => {
+					Animated.timing(animation, {
+						toValue: 0.5,
+						duration: 200,
+						useNativeDriver: true,
+					}).start(({ finished }) => {});
+				}}
+			>
+				<View style={{ flex: 1 }}>
+					<TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+						<Animated.View
+							style={{
+								backgroundColor: "black",
+								opacity: animation,
+								height: "100%",
+								width: "100%",
+								position: "absolute",
+								zIndex: -1,
+							}}
+						/>
+					</TouchableWithoutFeedback>
+
+					<View
+						style={{
+							opacity: 1,
+							backgroundColor: Colors.blue2,
+							flex: 1,
+							marginHorizontal: "10%",
+							marginVertical: "30%",
+							borderRadius: 10,
+							borderWidth: 2,
+							borderColor: "white",
+						}}
+					>
+						<View
+							style={{
+								backgroundColor: Colors.blue1,
+								marginHorizontal: "10%",
+								marginVertical: 10,
+								borderRadius: 10,
+								paddingVertical: 10,
+								alignItems: "center",
+							}}
+						>
+							<Forque style={{ fontSize: 30 }}>Menu</Forque>
+						</View>
+						<View
+							style={{
+								flex: 1,
+								marginHorizontal: "10%",
+								paddingVertical: 10,
+								alignItems: "center",
+							}}
+						>
+							<Button
+								title="Give up"
+								color="yellow"
+								style={{ width: 200 }}
+								onPress={() => {
+									setModalVisible2(true);
+								}}
+							/>
+							<Button
+								title="Restart"
+								color="yellow"
+								style={{ width: 200, marginTop: 20 }}
+								onPress={() => {
+									setModalVisible2(true);
+								}}
+							/>
+						</View>
+						<View
+							style={{
+								marginHorizontal: "10%",
+								paddingVertical: 10,
+								alignItems: "center",
+							}}
+						>
+							<Button
+								title="Close"
+								color="yellow"
+								style={{ width: 200 }}
+								onPress={() => {
+									setModalVisible(false);
+								}}
+							/>
+						</View>
+					</View>
+				</View>
+			</Modal>
+			<Modal
+				animationType="none"
+				transparent={true}
+				visible={modalVisible3}
+				onRequestClose={() => {
+					Animated.timing(animation, {
+						toValue: 0,
+						duration: 100,
+						useNativeDriver: true,
+					}).start(({ finished }) => {});
+				}}
+				onShow={() => {
+					Animated.timing(animation, {
+						toValue: 0.5,
+						duration: 200,
+						useNativeDriver: true,
+					}).start(({ finished }) => {});
+				}}
+			>
+				<View style={{ flex: 1 }}>
+					<TouchableWithoutFeedback onPress={() => setModalVisible(false)}>
+						<Animated.View
+							style={{
+								backgroundColor: "black",
+								opacity: animation,
+								height: "100%",
+								width: "100%",
+								position: "absolute",
+								zIndex: -1,
+							}}
+						/>
+					</TouchableWithoutFeedback>
+					<View
+						style={{
+							// opacity: 1,
+							flex: 1,
+							justifyContent: "center",
+						}}
+					>
+						<View
+							style={{
+								opacity: 1,
+								backgroundColor: Colors.blue2,
+								// flex: 1,
+								marginHorizontal: "10%",
+								// marginVertical: "50%",
+								borderRadius: 10,
+								borderWidth: 2,
+								borderColor: "white",
+							}}
+						>
+							<View
+								style={{
+									backgroundColor: Colors.blue1,
+									marginHorizontal: "10%",
+									marginVertical: 10,
+									borderRadius: 10,
+									paddingVertical: 10,
+									alignItems: "center",
+								}}
+							>
+								<Forque style={{ fontSize: 30 }}>
+									Do you want to skip one turn and heal your stamina bar?
+								</Forque>
+							</View>
+							<View
+								style={{
+									// flex: 1,
+									marginHorizontal: "10%",
+									paddingVertical: 10,
+									alignItems: "center",
+									flexDirection: "row",
+									justifyContent: "center",
+								}}
+							>
+								<Button
+									title="Skip and heal"
+									color="yellow"
+									style={{ marginHorizontal: 20 }}
+									onPress={() => {
+										dispatch(actions.updateSinglePanel("skip"));
+										setModalVisible3(false);
+									}}
+								/>
+								<Button
+									title="Cancel"
+									color="yellow"
+									style={{
+										marginHorizontal: 20,
+									}}
+									onPress={() => {
+										setModalVisible3(false);
+									}}
+								/>
+							</View>
+						</View>
+					</View>
+				</View>
+			</Modal>
+			<View style={{ flex: 1, marginBottom: 10 }}>
 				<View
 					style={{
-						height: 80,
+						// flex: 1,
+						height: 20,
+						backgroundColor: "#1a264d",
 						flexDirection: "row",
-						justifyContent: "space-around",
-						alignItems: "center",
+						borderRadius: 5,
+						// padding: 2,
+						marginHorizontal: 20,
+						height: 30,
+						shadowColor: "white",
+						shadowOffset: { width: 0, height: 1 },
+						shadowOpacity: 1,
+						shadowRadius: 1,
 					}}
 				>
-					<Button
-						type="outline"
-						title={i18n.t("back")}
-						onPress={async () => {
-							dispatch(actions.gameEnd());
-							navigation.navigate("BaseTabs");
+					<View
+						style={{
+							backgroundColor: "#60cdff",
+							width: `${(state.stamina / 100) * 100}%`,
+							// margin: 2,
+							borderRadius: 5,
 						}}
-					/>
-					<Button title={i18n.t("reset")} onPress={reset} />
+					></View>
+					<View
+						style={{
+							position: "absolute",
+							height: "100%",
+							width: "100%",
+							alignItems: "center",
+							justifyContent: "center",
+							// borderWidth: 1,
+						}}
+					>
+						<Text style={{ fontWeight: "700", color: "white" }}>
+							{state.stamina}/ {100}
+						</Text>
+					</View>
 				</View>
 				<View
 					style={{
@@ -273,7 +528,107 @@ export const MainScreen = ({ navigation, route }) => {
 					</View>
 				))}
 			</View>
-			{Platform.OS !== "web" && (
+			<View
+				style={{
+					// flex: 1,
+					height: "8%",
+					flexDirection: "row",
+				}}
+			>
+				<View
+					style={{
+						// flex: 1,
+						backgroundColor: "#1e1821",
+						// margin: 1,
+						marginBottom: 0,
+						borderRadius: 5,
+						borderWidth: 1,
+						borderColor: Colors.blue1,
+					}}
+				>
+					<View
+						style={{
+							// flex: 1,
+
+							backgroundColor: "#333841",
+							// marginVertical: 10,
+							marginHorizontal: 7,
+							borderRadius: 5,
+							// paddingHorizontal: 10,
+						}}
+					>
+						<View
+							style={{
+								// flex: 1,
+								// marginVertical: 10,
+
+								// alignItems: "center",
+								// justifyContent: "space-around",
+								flexDirection: "row",
+							}}
+						>
+							{team.map((item, i) => (
+								<Image
+									key={i}
+									style={[
+										{
+											// flex: 1,
+											width: undefined,
+											height: "100%",
+											aspectRatio: 1,
+											marginRight: 4,
+										},
+										i == 0 && {
+											borderWidth: 1.5,
+											borderColor: Colors.red2,
+										},
+									]}
+									source={characterPicker[item.n[0]][item.n[1]].icon}
+								/>
+							))}
+
+							{team.length < 3 && (
+								<View
+									style={{
+										width: undefined,
+										height: "100%",
+										aspectRatio: 1,
+										marginRight: 4,
+										borderWidth: 1.5,
+										borderColor: Colors.secondary,
+									}}
+								/>
+							)}
+							{team.length < 4 && (
+								<View
+									style={{
+										width: undefined,
+										height: "100%",
+										aspectRatio: 1,
+										marginRight: 4,
+										borderWidth: 1.5,
+										borderColor: Colors.secondary,
+									}}
+								/>
+							)}
+						</View>
+					</View>
+				</View>
+				<View
+					style={{
+						alignItems: "center",
+						justifyContent: "space-around",
+						flex: 1,
+						flexDirection: "row",
+					}}
+				>
+					<Button title="Skip" onPress={() => setModalVisible3(true)} />
+					<Button style={{ width: 40 }} onPress={() => setModalVisible(true)}>
+						<Icon name="menu" size={25} color="white" />
+					</Button>
+				</View>
+			</View>
+			{/* {Platform.OS !== "web" && (
 				<AdMobBanner
 					// style={{ width: 200 }}
 					// bannerSize="fullBanner"
@@ -286,7 +641,7 @@ export const MainScreen = ({ navigation, route }) => {
 					// servePersonalizedAds // true or false
 					// onDidFailToReceiveAdWithError={this.bannerError}
 				/>
-			)}
+			)} */}
 		</SafeAreaView>
 	);
 };
