@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "596387171215",
+    "project_id": "ngm-regenerate",
+    "storage_bucket": "ngm-regenerate.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596387171215:android:ae021d5177de1f6d98d9fa",
+        "android_client_info": {
+          "package_name": "net.webbel.regenerate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596387171215-vl07vv2os8bbm9katnasgv41nn5kmgsd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4ZuJxGXbePrTPM3V4RSHTTUPJrM-vvsE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596387171215-vl07vv2os8bbm9katnasgv41nn5kmgsd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "596387171215-qconk2lj2o90cdfsc07g55nmf3il26kp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ngm.regenerate"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

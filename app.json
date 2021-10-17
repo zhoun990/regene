@@ -1,59 +1,62 @@
 {
-  "expo": {
-    "name": "Re:Generate",
-    "slug": "regene",
-    "version": "1.0.1",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
-    "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#7d0b98"
-    },
-    "updates": {
-      "fallbackToCacheTimeout": 0
-    },
-    "assetBundlePatterns": ["**/*"],
-    "ios": {
-      "bundleIdentifier": "com.ngm.regenerate",
-      "buildNumber": "1.0.1.0",
-      "supportsTablet": true,
-      "userInterfaceStyle": "automatic",
-      "appStoreUrl":"https://apps.apple.com/us/app/re-generate/id1569430018",
-      "config": {
-        "googleMobileAdsAppId": "ca-app-pub-4125138884903603~3005556577"
-      },
-      "infoPlist": {
-        "CFBundleAllowMixedLocalizations": true,
-        "CFBundleLocalizations" : ["en", "ja"],
-        "CFBundleDevelopmentRegion" : "en"
-      },
-      "googleServicesFile": "./GoogleService-Info.plist"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/icon_adaptive.png",
-        "backgroundColor": "#FFFFFF"
-      }
-    },
-    "web": {
-      "favicon": "./assets/favicon.png",
-      "config": {
-        "firebase": {
-          "apiKey": "AIzaSyCLez3J6raU6tC5801-T-ytMxPeaqw84pI",
-          "authDomain": "ngm-regenerate.firebaseapp.com",
-          "projectId": "ngm-regenerate",
-          "storageBucket": "ngm-regenerate.appspot.com",
-          "messagingSenderId": "596387171215",
-          "appId": "1:596387171215:web:65db1f06a9356e1198d9fa",
-          "measurementId": "G-MP2LYGRS5W"
-        }
-      }
-    }
-  }
+	"expo": {
+		"name": "Re:Generate",
+		"slug": "regene",
+		"version": "1.0.1",
+		"platforms": ["ios", "android", "web"],
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"splash": {
+			"image": "./assets/splash.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#7d0b98"
+		},
+		"updates": {
+			"fallbackToCacheTimeout": 0
+		},
+		"assetBundlePatterns": ["**/*"],
+		"ios": {
+			"bundleIdentifier": "com.ngm.regenerate",
+			"buildNumber": "1.0.1.0",
+			"supportsTablet": true,
+			"userInterfaceStyle": "automatic",
+			"appStoreUrl": "https://apps.apple.com/us/app/re-generate/id1569430018",
+			"config": {
+				"googleMobileAdsAppId": "ca-app-pub-4125138884903603~3005556577"
+			},
+			"infoPlist": {
+				"CFBundleAllowMixedLocalizations": true,
+				"CFBundleLocalizations": ["en", "ja"],
+				"CFBundleDevelopmentRegion": "en"
+			},
+			"googleServicesFile": "./GoogleService-Info.plist"
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/icon_adaptive.png",
+				"backgroundColor": "#FFFFFF"
+			},
+			"config": {
+				"googleMobileAdsAppId": "ca-app-pub-4125138884903603~6049348197"
+			},
+			"package": "net.webbel.regenerate",
+			"googleServicesFile": "./google-services.json",
+			"permissions": [],
+			"versionCode": 2
+		},
+		"web": {
+			"favicon": "./assets/favicon.png",
+			"config": {
+				"firebase": {
+					"apiKey": "AIzaSyCLez3J6raU6tC5801-T-ytMxPeaqw84pI",
+					"authDomain": "ngm-regenerate.firebaseapp.com",
+					"projectId": "ngm-regenerate",
+					"storageBucket": "ngm-regenerate.appspot.com",
+					"messagingSenderId": "596387171215",
+					"appId": "1:596387171215:web:65db1f06a9356e1198d9fa",
+					"measurementId": "G-MP2LYGRS5W"
+				}
+			}
+		}
+	}
 }

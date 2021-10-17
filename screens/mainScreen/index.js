@@ -26,6 +26,7 @@ import Constants from "expo-constants";
 import * as Analytics from "expo-firebase-analytics";
 import * as StoreReview from "expo-store-review";
 import * as Haptics from "expo-haptics";
+import { RandomNumber } from "../../api/RandomNumber";
 
 export const Main = () => {
 	const dispatch = useDispatch();
@@ -49,13 +50,34 @@ export const Main = () => {
 			if (Platform.OS !== "web") {
 				// await setTestDeviceIDAsync("EMULATOR");
 				await AdMobRewarded.setAdUnitID(
-					"ca-app-pub-4125138884903603/4614205616"
-					//   __DEV__ || !Constants.isDevice
-					//     ? "ca-app-pub-3940256099942544/5224354917"
-					//     : "ca-app-pub-4125138884903603/4614205616"
+					// "ca-app-pub-4125138884903603/4614205616"
+					__DEV__ || !Constants.isDevice
+						? "ca-app-pub-3940256099942544/5224354917"
+						: Platform.OS === "ios"
+						? "ca-app-pub-4125138884903603/4614205616"
+						: "ca-app-pub-4125138884903603/8237146387"
 				);
 				adRequest();
-				await AdMobRewarded.requestAdAsync();
+				await AdMobRewarded.requestAdAsync().catch((err) =>
+					console.log("^_^ Log \n file: index.js \n line 62 \n err", err)
+				);
+			}
+		})();
+		(async () => {
+			if (Platform.OS !== "web") {
+				// await setTestDeviceIDAsync("EMULATOR");
+				await AdMobInterstitial.setAdUnitID(
+					// "ca-app-pub-4125138884903603/4614205616"
+					__DEV__ || !Constants.isDevice
+						? "ca-app-pub-3940256099942544/1033173712"
+						: Platform.OS === "ios"
+						? "ca-app-pub-4125138884903603/4598866853"
+						: "ca-app-pub-4125138884903603/3231613163"
+				);
+				adRequest();
+				await AdMobInterstitial.requestAdAsync().catch((err) =>
+					console.log("^_^ Log \n file: index.js \n line 62 \n err", err)
+				);
 			}
 		})();
 		Analytics.setCurrentScreen("xx_main_screen");
@@ -77,7 +99,18 @@ export const Main = () => {
 	//     }
 	//   }, []);
 	const adRequest = async () => {
-		// await AdMobRewarded.requestAdAsync();
+		await AdMobRewarded.requestAdAsync().catch((err) =>
+			console.log("^_^ Log \n file: index.js \n line 62 \n err", err)
+		);
+	};
+
+	const randomTriggerInterstitialAd = async () => {
+		if (RandomNumber(4, 0) === 1) {
+			await AdMobInterstitial.showAdAsync();
+			await AdMobInterstitial.requestAdAsync().catch((err) =>
+				console.log("^_^ Log \n file: index.js \n line 62 \n err", err)
+			);
+		}
 	};
 	const colorMaker = (n) => {
 		if (!panel[n].isDead) {
@@ -117,6 +150,10 @@ export const Main = () => {
 			window.alert(
 				"If you want to play all contents of Re:Generate, install the app from AppStore"
 			);
+		} else if (Platform.OS == "android") {
+			resetPanelAds(i18n.t("timeup")).then((bool) => {
+				dispatch(actions.updateSinglePanel(n));
+			});
 		} else {
 			resetPanelAds(i18n.t("timeup")).then((bool) => {
 				if (bool) {
@@ -129,37 +166,42 @@ export const Main = () => {
 			});
 		}
 	};
-	const reset = () => {
+	const reset = async () => {
 		if (Platform.OS == "web" && state.level == 1) {
 			dispatch(actions.initPanels());
 		} else {
-			resetPanelAds(i18n.t("watchAdsText")).then((bool) => {
-				if (bool) {
-					dispatch(actions.initPanels());
-					adRequest();
-					Analytics.logEvent("xx_reset_add_reworded");
-				} else {
-					Analytics.logEvent("xx_reset_ad_canceled");
-				}
-			});
+			dispatch(actions.initPanels());
+			await randomTriggerInterstitialAd();
+			// adRequest();
+			// resetPanelAds(i18n.t("watchAdsText")).then((bool) => {
+			// 	if (bool) {
+			// 		dispatch(actions.initPanels());
+			// 		adRequest();
+			// 		Analytics.logEvent("xx_reset_add_reworded");
+			// 	} else {
+			// 		Analytics.logEvent("xx_reset_ad_canceled");
+			// 	}
+			// });
 		}
 	};
-	const levelUp = () => {
+	const levelUp = async () => {
 		if (Platform.OS == "web" && state.level == 1) {
 			window.alert(
 				"If you want to play all contents of Re:Generate, install the app from AppStore"
 			);
 		} else {
-			resetPanelAds(i18n.t("nextAds")).then((bool) => {
-				if (bool) {
-					Analytics.logEvent("xx_level_uped");
+			dispatch(actions.levelHandler(true));
+			await randomTriggerInterstitialAd();
+			// resetPanelAds(i18n.t("nextAds")).then((bool) => {
+			// 	if (bool) {
+			// 		Analytics.logEvent("xx_level_uped");
 
-					dispatch(actions.levelHandler(true));
-					adRequest();
-				} else {
-					Analytics.logEvent("xx_level_up_canceled");
-				}
-			});
+			// 		dispatch(actions.levelHandler(true));
+			// 		adRequest();
+			// 	} else {
+			// 		Analytics.logEvent("xx_level_up_canceled");
+			// 	}
+			// });
 		}
 	};
 	return (
@@ -196,26 +238,28 @@ export const Main = () => {
 								width: 100,
 							}}
 							onPress={() => {
-								Alert.alert(
-									i18n.t("levelDownAlert"),
-									``,
-									[
-										{
-											text: i18n.t("levelDown"),
-											onPress: () => {
-												dispatch(actions.levelHandler(false));
-												Analytics.logEvent("xx_level_downed");
-											},
-										},
-										{
-											text: i18n.t("cancel"),
-											onPress: () => {
-												Analytics.logEvent("xx_level_down_canceled");
-											},
-										},
-									],
-									{ cancelable: true }
-								);
+								dispatch(actions.levelHandler(false));
+								Analytics.logEvent("xx_level_downed");
+								// Alert.alert(
+								// 	i18n.t("levelDownAlert"),
+								// 	``,
+								// 	[
+								// 		{
+								// 			text: i18n.t("levelDown"),
+								// 			onPress: () => {
+								// 				dispatch(actions.levelHandler(false));
+								// 				Analytics.logEvent("xx_level_downed");
+								// 			},
+								// 		},
+								// 		{
+								// 			text: i18n.t("cancel"),
+								// 			onPress: () => {
+								// 				Analytics.logEvent("xx_level_down_canceled");
+								// 			},
+								// 		},
+								// 	],
+								// 	{ cancelable: true }
+								// );
 							}}
 							disabled={state.level == 1}
 						/>
@@ -312,10 +356,12 @@ export const Main = () => {
 					// style={{ width: 200 }}
 					// bannerSize="fullBanner"
 					adUnitID={
-						"ca-app-pub-4125138884903603/8811297461"
-						//   __DEV__ || !Constants.isDevice
-						//     ? "ca-app-pub-3940256099942544/6300978111"
-						//     : "ca-app-pub-4125138884903603/8811297461"
+						// "ca-app-pub-4125138884903603/8811297461"
+						__DEV__ || !Constants.isDevice
+							? "ca-app-pub-3940256099942544/6300978111"
+							: Platform.OS === "ios"
+							? "ca-app-pub-4125138884903603/8811297461"
+							: "ca-app-pub-4125138884903603/8003420080"
 					} // Test ID, Replace with your-admob-unit-id
 					// servePersonalizedAds // true or false
 					// onDidFailToReceiveAdWithError={this.bannerError}
